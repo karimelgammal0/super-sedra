@@ -161,6 +161,20 @@ html,body{overscroll-behavior:none}
  #cv{border-radius:0}
 }
 @media (orientation:portrait){ .ctl{padding:8px 14px} .cb{width:68px;height:68px}.cb.jb{width:84px;height:84px} }
+/* short landscape phones: compact home + compact question cards */
+@media (max-height:560px){
+ .hero{display:grid;grid-template-columns:38% 1fr;column-gap:14px;align-items:center;padding:8px 14px;min-height:calc(100dvh - 4px)}
+ .hero .herosky{display:none}
+ .hero .sid{grid-row:1/span 6;grid-column:1;width:auto;height:min(78dvh,300px);margin:0}
+ .hero>*:not(.sid):not(.herosky){grid-column:2}
+ .hero h1{font-size:28px;margin:0}.hero .sub{margin:2px 0}.hero .btn{margin:4px 0;padding:8px 14px;font-size:17px}
+ .qm{padding:4px}.qbox,.obox{padding:8px 10px;border-radius:14px}
+ .qh{margin-bottom:2px}.qh .s3,.qsid img{height:34px;width:auto}
+ .q{font-size:16px;margin:2px 0 6px}.opt{padding:6px 10px;font-size:15px}.opts{gap:5px}
+ .tfr{margin:3px 0;padding:4px 8px}.tfs{font-size:14px}
+ .btn{padding:8px 14px;font-size:16px;margin:5px 0}.fb{margin-top:6px;padding:6px 10px}
+ .tfq{min-height:60px;padding:8px 6px;font-size:17px}
+}
 </style>
 <div id="app"></div>
 <script>
@@ -2867,4 +2881,8 @@ document.addEventListener('click',e=>{
 window.QUEST={arcade,runArcade,S,LV,startLevel,home,map,preview,openQ,get G(){return G;},set G(v){},cur:null,last:null,lvDef:()=>lvDef,save};
 if(G3.ok){ try{ G3.snap=G3U.snapshots(); }catch(e){ G3.snap=null; } if(G3.snap){ const SVGS=sidra; sidra=function(mood,arms,view,pose){ if(view==='bust'){ const key=arms==='wave'?'wave':(G3.snap[mood]?mood:'happy'); return '<img class="s3" alt="" src="'+G3.snap[key]+'">'; } return SVGS(mood,arms,view,pose); }; } }
 loadSprites(); subjects();
+/* fit overlays inside the visible screen (phones): shrink instead of scrolling */
+(function(){ let busy=0; const fit=()=>{ busy=0; document.querySelectorAll('.qbox,.obox').forEach(b=>{ const host=b.parentElement; if(!host||host.hidden||host.offsetParent===null&&getComputedStyle(host).position!=='fixed') return; b.style.zoom=''; const avail=window.innerHeight-14, h=b.offsetHeight; if(h>avail){ b.style.zoom=Math.max(.55,avail/h).toFixed(3); } }); };
+ const sched=()=>{ if(!busy){ busy=1; requestAnimationFrame(fit); } };
+ try{ new MutationObserver(sched).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden','class']}); window.addEventListener('resize',sched); window.addEventListener('orientationchange',sched); }catch(e){} })();
 </script><script>try{ if("serviceWorker" in navigator && /^https?:/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(function(){}); }catch(e){}</script>
