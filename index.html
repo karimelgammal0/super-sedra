@@ -207,6 +207,7 @@ html,body{overscroll-behavior:none}
 .exh i{font-style:normal;background:#6c5ce7;color:#fff;border-radius:50%;min-width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.8em}.exq.open .exh i{background:#00b894}
 .exa{padding:8px 12px 12px;border-top:2px dashed #dfe6e9;background:#f1fbf6}.exa .kans{font-weight:800;color:#0a7c5a;font-size:1.05em}
 .exs{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}.exst{position:sticky;top:0;z-index:2;background:#6c5ce7;color:#fff;font-weight:800;padding:8px 12px;border-radius:12px}.exst small{opacity:.8;font-weight:600;margin-inline-start:6px}
+.exu{font-weight:800;color:#6c5ce7;margin:8px 4px 0}
 </style>
 <div id="app"></div>
 <script>
@@ -3276,17 +3277,17 @@ const KB=(()=>{
   const toks=s=>{ const o=[]; nrm(s).split(' ').forEach(w=>{ if(!w||SW.has(w)) return; if(w.length<2&&!/\d/.test(w)) return; o.push(stem(w)); }); return o; };
   const plain=s=>String(s==null?'':s).replace(/<[^>]+>/g,'');
   const cache={};
-  function add(ix,e){ if(e.t==='q'&&toks(e.q).length<2&&!(e.x&&String(e.x).length>40)) return; const k=nrm(e.q+' '+e.a); if(ix.seen[k]) return; ix.seen[k]=1; e.tq=new Set(toks(e.q)); e.ta=new Set(toks(e.q+' '+e.x)); if(!e.ta.size) return; ix.list.push(e); e.i=ix.list.length-1; }
+  function add(ix,e){ if(e.t==='q'&&toks(e.q).length<2&&!(e.x&&String(e.x).length>40)) return; const k=nrm(e.q+' '+e.a); if(ix.seen[k]) return; ix.seen[k]=1; e.ty=ix.cty; e.tq=new Set(toks(e.q)); e.ta=new Set(toks(e.q+' '+e.x)); if(!e.ta.size) return; ix.list.push(e); e.i=ix.list.length-1; }
   function build(subj){
     if(cache[subj]) return cache[subj];
     const ar=subj==='ss', CHs=ar?SS_CHAPTERS:CHAPTERS, ix={list:[],seen:{},df:{},cards:{}};
     const Y=ar?['صح ✅','خطأ ❌']:['True ✅','False ❌'];
     CHs.forEach(ch=>ch.levels.forEach(l=>{
-      const src={lab:l.lab||l.id,title:l.title,id:l.id};
-      (l.lesson||[]).forEach((c,ci)=>{ const body=(c.pts||[]).join('\n'); const e={t:'card',q:c.h||'',x:plain(body),a:body,why:'',src,card:[l.id,ci]}; add(ix,e); });
-      (l.vocab||[]).forEach(v=>{ add(ix,{t:'vocab',q:v[0],x:v[1],a:v[1],why:'',src}); });
+      const src={lab:l.lab||l.id,title:l.title,id:l.id,unit:ch.title};
+      ix.cty=null; (l.lesson||[]).forEach((c,ci)=>{ const body=(c.pts||[]).join('\n'); const e={t:'card',q:c.h||'',x:plain(body),a:body,why:'',src,card:[l.id,ci]}; add(ix,e); });
+      ix.cty=null; (l.vocab||[]).forEach(v=>{ add(ix,{t:'vocab',q:v[0],x:v[1],a:v[1],why:'',src}); });
       l.blocks.forEach(b=>b.parts.forEach(p=>{
-        const w=p.why||'';
+        const w=p.why||''; ix.cty=p.t;
         switch(p.t){
           case 'mc': add(ix,{t:'q',q:p.q,x:[p.ok].concat(p.bad||[]).join(' '),a:p.ok,why:w,src}); break;
           case 'multi': add(ix,{t:'q',q:p.q,x:p.ok.concat(p.bad||[]).join(' '),a:p.ok.join('\n• '),list:1,why:w,src}); break;
@@ -3301,7 +3302,7 @@ const KB=(()=>{
         }
       }));
     }));
-    if(typeof KBX!=='undefined') KBX.filter(x=>x.s===subj).forEach(x=>{ add(ix,{t:'q',q:x.q,x:'',a:x.a,why:x.w||'',src:{lab:x.lab,title:x.title,id:'x'}}); });
+    ix.cty=null; if(typeof KBX!=='undefined') KBX.filter(x=>x.s===subj).forEach(x=>{ add(ix,{t:'q',q:x.q,x:'',a:x.a,why:x.w||'',src:{lab:x.lab,title:x.title,id:'x'}}); });
     ix.list.forEach(e=>{ e.ta.forEach(t=>{ ix.df[t]=(ix.df[t]||0)+1; }); });
     ix.N=ix.list.length; cache[subj]=ix; return ix;
   }
@@ -3438,6 +3439,8 @@ function coach(){
   (async()=>{ let s=null; try{ if(window.claude&&window.claude.use) s=await window.claude.use('sample'); }catch(e){} if(!document.body.contains(ask)||!s) return; coachSmp=s; try{ const lim=await s.limits(); if(lim&&lim.images) coachImgOK=true; }catch(e){} })();
 }
 
+const EXMAP={mc:'mcq',multi:'multi',why:'why',happen:'hap',spell:'term',order:'ord',fill:'cmp',tfset:'tf',sort:'sort',match:'mat'};
+function exKind2(x){ return (x.ty&&EXMAP[x.ty])||exKind(x); }
 function exKind(x){
   const q=x.q, a=x.a||'';
   if(/^(True|False)/.test(a)||/^(صح|خطأ)/.test(a)) return 'tf';
@@ -3461,20 +3464,20 @@ function exKind(x){
   if(/____/.test(q)) return 'cmp';
   return 'var';
 }
-const EX_ORDER=['mcq','multi','mat','tf','cor','br','term','cmp','why','hap','def','odd','cmpr','imp','ex','num','var'];
-const EX_NAME={mcq:['Choose the correct answer','اختاري الإجابة الصحيحة'],multi:['Choose all the correct answers','اختاري كل الإجابات الصحيحة'],mat:['Match (A) with (B)','صلي'],tf:['Put (✓) or (✗)','ضعي (✓) أو (✗)'],cor:['Correct the underlined words','صحّحي الكلمات التي تحتها خط'],br:['Choose from the brackets','اختاري من بين القوسين'],term:['Write the scientific term','اكتبي المصطلح العلمي'],cmp:['Complete the following','أكملي'],why:['Give reasons','علّلي'],hap:['What happens if…?','ماذا يحدث؟'],def:['What is meant by…?','ما المقصود بـ؟'],odd:['Cross out the odd word','اشطبي الكلمة الشاذة'],cmpr:['Compare between','قارني'],imp:['What is the importance of…?','ما أهمية؟'],ex:['Give an example','اذكري مثالًا'],num:['Write the number','اكتبي الرقم'],var:['Variant questions','أسئلة متنوعة']};
+const EX_ORDER=['mcq','multi','mat','tf','cor','br','term','cmp','why','hap','def','odd','cmpr','imp','ex','num','ord','sort','var'];
+const EX_NAME={mcq:['Choose the correct answer','اختاري الإجابة الصحيحة'],multi:['Choose all the correct answers','اختاري كل الإجابات الصحيحة'],mat:['Match (A) with (B)','صلي'],tf:['Put (✓) or (✗)','ضعي (✓) أو (✗)'],cor:['Correct the underlined words','صحّحي الكلمات التي تحتها خط'],br:['Choose from the brackets','اختاري من بين القوسين'],term:['Write the scientific term','اكتبي المصطلح العلمي'],cmp:['Complete the following','أكملي'],why:['Give reasons','علّلي'],hap:['What happens if…?','ماذا يحدث؟'],def:['What is meant by…?','ما المقصود بـ؟'],odd:['Cross out the odd word','اشطبي الكلمة الشاذة'],cmpr:['Compare between','قارني'],imp:['What is the importance of…?','ما أهمية؟'],ex:['Give an example','اذكري مثالًا'],num:['Write the number','اكتبي الرقم'],var:['Variant questions','أسئلة متنوعة'],ord:['Put in order','رتّبي'],sort:['Classify','صنّفي']};
 function exercises(lab){
-  const ar=AR(); const all=(typeof KBX!=='undefined'?KBX:[]).filter(x=>x.s===S.subject);
-  const grp={}; all.forEach(x=>{ (grp[x.lab]=grp[x.lab]||{lab:x.lab,title:x.title,items:[]}).items.push(x); });
-  const keys=Object.keys(grp).sort((a,b)=>(parseInt(a.replace(/\D/g,''))||0)-(parseInt(b.replace(/\D/g,''))||0));
+  const ar=AR(); const all=ar?KB.build('ss').list.filter(e=>e.t==='q').map(e=>({s:'ss',lab:e.src.lab.replace(/\s*·\s*\d+$/,''),title:e.src.title.replace(/\s*\(الجزء \d+\)/,''),unit:e.src.unit||'',q:e.q,a:e.a,w:e.why,ty:e.ty})):(typeof KBX!=='undefined'?KBX:[]).filter(x=>x.s===S.subject);
+  const grp={}; all.forEach(x=>{ (grp[x.lab]=grp[x.lab]||{lab:x.lab,title:x.title,unit:x.unit,items:[]}).items.push(x); });
+  const keys=ar?Object.keys(grp):Object.keys(grp).sort((a,b)=>(parseInt(a.replace(/\D/g,''))||0)-(parseInt(b.replace(/\D/g,''))||0));
   const H=t=>esc(t).replace(/\n/g,'<br>');
   if(!lab){
-    show(topbar('home','📝 '+TT('Exercises','التمارين'))+'<div class="pg"><div class="exl">'+(keys.length?keys.map(k=>'<button class="btn exc" data-lab="'+esc(k)+'"><b>'+esc(grp[k].lab)+'</b> · '+esc(grp[k].title.replace(/ · .*$/,''))+'<span>'+grp[k].items.length+' '+TT('questions','سؤال')+'</span></button>').join(''):'<div class="cemp">'+TT('Exercises are coming soon.','التمارين قريبًا.')+'</div>')+'</div></div>','exscreen');
+    show(topbar('home','📝 '+TT('Exercises','التمارين'))+'<div class="pg"><div class="exl">'+(keys.length?keys.map((k,i)=>(ar&&(i===0||grp[keys[i-1]].unit!==grp[k].unit)?'<div class="exu">'+esc(grp[k].unit)+'</div>':'')+'<button class="btn exc" data-lab="'+esc(k)+'"><b>'+esc(grp[k].lab)+'</b> · '+esc(grp[k].title.replace(/ · .*$/,''))+'<span>'+grp[k].items.length+' '+TT('questions','سؤال')+'</span></button>').join(''):'<div class="cemp">'+TT('Exercises are coming soon.','التمارين قريبًا.')+'</div>')+'</div></div>','exscreen');
     document.querySelectorAll('.exc').forEach(b=>b.onclick=()=>exercises(b.dataset.lab));
     return;
   }
   const g=grp[lab]; if(!g) return exercises();
-  const secs={}; g.items.forEach(x=>{ (secs[exKind(x)]=secs[exKind(x)]||[]).push(x); });
+  const secs={}; g.items.forEach(x=>{ (secs[exKind2(x)]=secs[exKind2(x)]||[]).push(x); });
   const body=EX_ORDER.filter(k=>secs[k]).map((k,si)=>'<div class="exs"><div class="exst">'+(si+1)+' · '+TT(EX_NAME[k][0],EX_NAME[k][1])+' <small>'+secs[k].length+'</small></div>'+secs[k].map((x,i)=>'<div class="exq"><button class="exh"><i>'+(i+1)+'</i><span>'+H(x.q)+'</span></button><div class="exa" hidden><div class="kans">'+H(KB.plain(x.a))+'</div>'+(x.w?'<div class="kw">💡 '+H(x.w)+'</div>':'')+'</div></div>').join('')+'</div>').join('');
   show(topbar('exr','📝 '+esc(g.lab)+' · '+TT('Questions','الأسئلة'))+'<div class="pg"><div class="exl">'+body+'</div></div>','exscreen');
   document.querySelectorAll('.exh').forEach(b=>b.onclick=()=>{ const a=b.nextElementSibling; a.hidden=!a.hidden; b.parentNode.classList.toggle('open',!a.hidden); });
