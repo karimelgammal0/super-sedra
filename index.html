@@ -186,6 +186,11 @@ html,body{overscroll-behavior:none}
 .cemp{margin:auto;text-align:center;font-weight:700;color:var(--mut);padding:10px}.cemp .big{font-size:40px}
 .cb2{border-radius:14px;padding:8px 12px;line-height:1.45;font-size:16px;max-width:94%}.cb2.me{background:#e6f6fc;align-self:flex-end}.cb2.ai{background:#fff7d6;align-self:flex-start;font-weight:600}.cb2.wait{opacity:.6}.cb2.err{background:#ffe1e2;align-self:center}
 @media (orientation:landscape) and (max-height:600px){ .coach{flex-direction:row}.cin{width:42%}.cans{flex:1}#cq{flex:1;min-height:60px} }
+.cph input{display:none}.crow .btn{padding:10px 8px;font-size:15px}
+.ka{background:#fff;border:2px solid #ffe08a;border-radius:12px;padding:8px 10px;margin:2px 0}.ka.l{border-color:#cfe9f5;background:#f4fbff}
+.kt{font-weight:800;font-size:13px;color:#8a5d00}.ka.l .kt{color:#1b7a9c}.kq{font-weight:800;margin:2px 0}.kans{font-weight:800;font-size:17px;line-height:1.5;color:#17324d}.kw{margin-top:4px;font-size:15px;color:#2d5a3d;font-weight:700}.ks{margin-top:4px;font-size:12px;color:var(--mut);font-weight:700}
+.kqq{font-weight:800;margin:6px 0 2px;color:var(--pri2)}.knf{font-weight:700;color:#8a5d00;margin:4px 0}.ksim{font-size:14px;margin:4px 0;color:#52667a}.kless{margin-top:4px}.kmore{margin:6px 0 !important}
+.ka.l .kans{font-weight:600;font-size:15px}.ka .kans{overflow-wrap:anywhere}
 </style>
 <div id="app"></div>
 <script>
@@ -2613,6 +2618,140 @@ function runArcade(kind){
     ask(1,()=>{ mount(); raf=requestAnimationFrame(loop); }); }
   window.QUEST.arcStop=stop;
 }
+/* ---------- Coach: ask any question (typed or photo) -> model answer from the books ---------- */
+const KB=(()=>{
+  const SW=new Set(('في من علي الي عن ما ماذا هل هو هي هذا هذه ذلك التي الذي كل او ثم قد لا لم لن ان كان يكون تكون مع به بها له لها اي اختر اختاري الاجابه الصحيحه صواب خطا اكمل ضع علامه امام العباره التاليه بين القوسين وصل صل علل فسر لماذا يحدث لو ماذا كيف هي هم هن نحن انت انتم عند حتي قبل بعد ايضا اذا اذ كما مما عما فيما بما لما الا غير بعض'+' a an the is are was were be been of to in on at for and or it its this that these those with as by from what which who why how do does did can could will would should you your we our they them he she his her not no yes all any choose correct answer true false complete put write following sentence between mark').split(' '));
+  const nrm=s=>String(s==null?'':s).replace(/<[^>]+>/g,' ').toLowerCase().replace(/[ً-ٰٟـ]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/[①②③④⑤⑥⑦⑧⑨⑩]/g,' ').replace(/[^؀-ۿa-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+  const stem=w=>{ if(/[؀-ۿ]/.test(w)){ if(w.length>4) w=w.replace(/^(وال|بال|كال|فال|لل|ال)/,''); if(w.length>4) w=w.replace(/^[وبلفك](?=..)/,''); if(w.length>4) w=w.replace(/(ات|ان|ين|ون|ها|هم|ه|ي)$/,''); return w; } if(w.length>4) w=w.replace(/(ing|ed|es)$/,''); if(w.length>3) w=w.replace(/s$/,''); return w; };
+  const toks=s=>{ const o=[]; nrm(s).split(' ').forEach(w=>{ if(!w||SW.has(w)) return; if(w.length<2&&!/\d/.test(w)) return; o.push(stem(w)); }); return o; };
+  const plain=s=>String(s==null?'':s).replace(/<[^>]+>/g,'');
+  const cache={};
+  function add(ix,e){ if(e.t==='q'&&toks(e.q).length<2&&!(e.x&&String(e.x).length>40)) return; const k=nrm(e.q+' '+e.a); if(ix.seen[k]) return; ix.seen[k]=1; e.tq=new Set(toks(e.q)); e.ta=new Set(toks(e.q+' '+e.x)); if(!e.ta.size) return; ix.list.push(e); e.i=ix.list.length-1; }
+  function build(subj){
+    if(cache[subj]) return cache[subj];
+    const ar=subj==='ss', CHs=ar?SS_CHAPTERS:CHAPTERS, ix={list:[],seen:{},df:{},cards:{}};
+    const Y=ar?['صح ✅','خطأ ❌']:['True ✅','False ❌'];
+    CHs.forEach(ch=>ch.levels.forEach(l=>{
+      const src={lab:l.lab||l.id,title:l.title,id:l.id};
+      (l.lesson||[]).forEach((c,ci)=>{ const body=(c.pts||[]).join('\n'); const e={t:'card',q:c.h||'',x:plain(body),a:body,why:'',src,card:[l.id,ci]}; add(ix,e); });
+      (l.vocab||[]).forEach(v=>{ add(ix,{t:'vocab',q:v[0],x:v[1],a:v[1],why:'',src}); });
+      l.blocks.forEach(b=>b.parts.forEach(p=>{
+        const w=p.why||'';
+        switch(p.t){
+          case 'mc': add(ix,{t:'q',q:p.q,x:[p.ok].concat(p.bad||[]).join(' '),a:p.ok,why:w,src}); break;
+          case 'multi': add(ix,{t:'q',q:p.q,x:p.ok.concat(p.bad||[]).join(' '),a:p.ok.join('\n• '),list:1,why:w,src}); break;
+          case 'why': add(ix,{t:'q',q:p.q,x:p.ok.concat(p.bad||[]).join(' '),a:p.ok.join('\n• '),list:1,why:w,src}); break;
+          case 'happen': add(ix,{t:'q',q:p.q,x:[p.ok].concat(p.bad||[]).join(' '),a:p.ok,why:w,src}); break;
+          case 'spell': add(ix,{t:'q',q:p.q,x:p.ans,a:p.ans,why:w,src}); break;
+          case 'order': add(ix,{t:'q',q:p.q,x:p.steps.join(' '),a:p.steps.map((s,i)=>(i+1)+') '+s).join('\n'),why:w,src}); break;
+          case 'fill': String(p.text).split('\n').forEach(line=>{ const ans=[]; const q=line.replace(/\[\[(.+?)\]\]/g,(m,a)=>{ ans.push(a); return '____'; }).replace(/^[①-⑩]\s*/,''); if(!ans.length) return; add(ix,{t:'q',q:q,x:ans.join(' '),a:line.replace(/^[①-⑩]\s*/,'').replace(/\[\[(.+?)\]\]/g,'$1')+'\n('+ans.join(' / ')+')',why:w,src}); }); break;
+          case 'tfset': p.items.forEach(it=>{ add(ix,{t:'q',q:it[0],x:'',a:it[1]?Y[0]:Y[1],why:w,src}); }); break;
+          case 'sort': p.items.forEach(it=>{ add(ix,{t:'q',q:it[0]+' '+p.q,x:p.bins[it[2]],a:it[0]+' → '+p.bins[it[2]],why:w,src}); }); break;
+          case 'match': add(ix,{t:'q',q:p.q,x:p.pairs.map(r=>r[0]+' '+r[1]).join(' '),a:p.pairs.map(r=>r[0]+' → '+r[1]).join('\n'),why:w,src}); p.pairs.forEach(r=>{ add(ix,{t:'q',q:r[0]+' '+p.q,x:r[1],a:r[0]+' → '+r[1],why:w,src}); }); break;
+        }
+      }));
+    }));
+    ix.list.forEach(e=>{ e.ta.forEach(t=>{ ix.df[t]=(ix.df[t]||0)+1; }); });
+    ix.N=ix.list.length; cache[subj]=ix; return ix;
+  }
+  const idf=(ix,t)=>Math.log(1+(ix.N+1)/((ix.df[t]||0)+1));
+  function search(ix,query,n){
+    const qt=new Set(toks(query)); if(!qt.size) return [];
+    const qn=nrm(query); let Wq=0; qt.forEach(t=>{ Wq+=idf(ix,t); });
+    const out=[];
+    ix.list.forEach(e=>{
+      let best=0;
+      [e.tq,e.ta].forEach(ds=>{ if(!ds.size) return; let Wd=0,Wi=0; ds.forEach(t=>{ const v=idf(ix,t); Wd+=v; if(qt.has(t)) Wi+=v; }); if(!Wi) return; const dice=2*Wi/(Wq+Wd), cov=Wi/Wq, dcov=Wi/Wd; const sc=Math.max(dice,0.55*cov+0.45*dice*(ds===e.tq?1:.9),0.5*dcov+0.5*dice); if(sc>best) best=sc; });
+      if(!best) return;
+      if(e.t==='vocab'){ const tn=nrm(e.q); if(tn&&qn.indexOf(tn)>=0&&qt.size<=3) best+=.25; }
+      if(e.t==='card'&&e.q){ const tn=nrm(e.q); if(tn&&qn.indexOf(tn)>=0) best+=.1; }
+      out.push({e,s:best});
+    });
+    out.sort((a,b)=>b.s-a.s); return out.slice(0,n||6);
+  }
+  function lessonFor(ix,lid,query){ const cs=ix.list.filter(e=>e.t==='card'&&e.src.id===lid); if(!cs.length) return null; const qt=new Set(toks(query)); let best=null,bs=-1; cs.forEach(e=>{ let s=0; e.ta.forEach(t=>{ if(qt.has(t)) s+=idf(ix,t); }); if(s>bs){ bs=s; best=e; } }); return best; }
+  function split(text){ const lines=String(text).split(/\n+/).map(s=>s.trim()).filter(Boolean); const blocks=[]; let last=0; const start=l=>{ const m=l.match(/^\(?([\d٠-٩]{1,2})\s*([\)\.\-–:،]?)/); if(m){ const n=+String(m[1]).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)); if(m[2]||n===last+1){ last=n; return true; } } if(/^([①-⑩]|q\s*\d|س\s*\d)/i.test(l)){ last++; return true; } return false; }; lines.forEach(l=>{ if(start(l)||!blocks.length) blocks.push(l); else blocks[blocks.length-1]+=' '+l; }); return blocks.length>1?blocks:[String(text).replace(/\s+/g,' ').trim()]; }
+  return {build,search,lessonFor,split,nrm,toks,plain};
+})();
+
+let coachTurns=[], coachImgs=[], coachCtl=null, coachSmp=null, coachBusy=0, coachImgOK=false;
+function coachPrompt(ref){
+  const ar=S.subject==='ss';
+  const R=(ref&&ref.length)?(ar?'\n\nمراجع من كتب سدرة وسلاح التلميذ (إجابات نموذجية؛ اعتمد عليها كمصدر أساسي):\n':'\n\nReference model answers from Sidra\'s books and guide (use as the main source of truth):\n')+ref.map(r=>'- '+r).join('\n'):'';
+  if(ar) return 'أنت «كوتش»، مدرّب ودود لتلميذة اسمها سدرة في الصف الرابع الابتدائي بمصر. المادة: الدراسات الاجتماعية (المنهج المصري، الترم الأول).\nأجب عن سؤال التلميذة. القواعد: ابدأ بسطر «✅ الإجابة:» واضح. ثم «💡 الشرح:» في 3 إلى 5 جمل قصيرة بكلمات يفهمها طفل عمره 9 سنين. وإن أمكن أضف «🧠 حيلة للحفظ:». لا تخترع معلومات؛ لو لست متأكدًا فقل ذلك. لو السؤال ليس من الدراسات الاجتماعية فاطلب بلطف توضيحًا. استخدم نصًا عاديًا و**للتمييز** فقط بدون جداول أو عناوين.'+R;
+  return 'You are "Coach", a friendly tutor for Sidra, an Egyptian girl in Primary 4. Subject: Science (Egyptian curriculum, taught in English, Term 1).\nAnswer her question. Rules: start with a line "✅ Answer:" in one clear line. Then "💡 Explanation:" in 3-5 short sentences using simple words a 9-year-old knows. If helpful add "🧠 Memory trick:". Finish with one line in simple Egyptian Arabic starting with "بالعربي:". Do not invent facts; if unsure, say so. If the question is not about Science, kindly ask her to rephrase. Plain text with **bold** only, no tables or headings.'+R;
+}
+const coachMd=t=>esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/^\s*[-•*]\s+/gm,'• ').replace(/\n/g,'<br>');
+function coachErr(code){ const m={not_granted:['Coach needs your permission to use Claude.','المدرّب محتاج إذنك لاستخدام Claude.'],sampling_disabled:['Claude is not available on this account.','Claude مش متاح على الحساب ده.'],rate_limited:['Too many questions too fast. Wait a little and try again.','أسئلة كتير بسرعة. استني شوية وجرّبي تاني.'],image_rejected:['I could not read that photo. Try another one.','مقدرتش أقرأ الصورة دي. جرّبي صورة تانية.'],session_expired:['Please sign in again.','سجّلي دخول تاني من فضلك.'],refused:['I can\'t help with that one. Try another question.','مقدرش أساعد في السؤال ده. جرّبي سؤال تاني.'],upstream_error:['Connection problem. Try again.','في مشكلة في الاتصال. جرّبي تاني.']}[code]||['Something went wrong. Try again.','حصلت مشكلة. جرّبي تاني.']; return TT(m[0],m[1]); }
+const coachLoadScript=u=>new Promise((ok,no)=>{ const s=document.createElement('script'); s.src=u; s.onload=ok; s.onerror=()=>no(new Error('load')); document.head.appendChild(s); });
+async function coachPrep(file){ try{ const bm=await createImageBitmap(file); const M=1700, k=Math.min(1,M/Math.max(bm.width,bm.height)); const c=document.createElement('canvas'); c.width=Math.round(bm.width*k); c.height=Math.round(bm.height*k); const x=c.getContext('2d'); x.filter='grayscale(1) contrast(1.35)'; x.drawImage(bm,0,0,c.width,c.height); return await new Promise(r=>c.toBlob(r,'image/png')); }catch(e){ return file; } }
+let coachOcr=null;
+async function coachOCR(file,onProg){
+  if(!window.Tesseract) await coachLoadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
+  const lang=S.subject==='ss'?'ara':'eng';
+  if(!coachOcr||coachOcr.lang!==lang){ if(coachOcr){ try{ await coachOcr.w.terminate(); }catch(e){} } const w=await Tesseract.createWorker(lang,1,{workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/worker.min.js',corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.1',langPath:'https://cdn.jsdelivr.net/npm/@tesseract.js-data/'+lang+'/4.0.0_best_int',logger:m=>{ if(m&&m.status==='recognizing text'&&onProg) onProg(m.progress); }}); coachOcr={w,lang}; }
+  const img=await coachPrep(file); const r=await coachOcr.w.recognize(img); return (r.data.text||'').trim();
+}
+function coach(){
+  const ar=AR(); coachTurns=[]; coachImgs=[]; coachSmp=null; coachBusy=0; coachImgOK=false;
+  const ix=KB.build(S.subject);
+  show(topbar('home','🧑‍🏫 Coach · '+TT('Ask me anything','اسألي المدرّب'))+'<div class="pg coachpg"><div class="coach"><div class="cin">'+
+   '<textarea id="cq" rows="3" placeholder="'+TT('Type your question here… or take a photo 📷','اكتبي سؤالك هنا… أو صوّريه 📷')+'"></textarea><div id="cth" class="cth"></div>'+
+   '<div class="crow"><label class="btn sec cph">📷 '+TT('Camera','صوّري')+'<input id="cph" type="file" accept="image/*" capture="environment"></label><label class="btn sec cph">🖼️ '+TT('Gallery','معرض')+'<input id="cgal" type="file" accept="image/*"></label><button class="btn" id="cask">✨ '+TT('Answer','جاوبي')+'</button></div>'+
+   '<button class="btn ghost" id="cnew" hidden>🔄 '+TT('New question','سؤال جديد')+'</button></div>'+
+   '<div class="cans" id="cans"><div class="cemp"><div class="big">🧑‍🏫</div>'+TT('Hi Sidra! Type a question or take a photo of it, and I will give you the model answer from your books.','أهلًا يا سدرة! اكتبي أي سؤال أو صوّريه وأنا أجيبلك الإجابة النموذجية من كتبك.')+'</div></div></div></div>','coachscreen');
+  const ans=$('#cans'), ask=$('#cask'), q=$('#cq'), th=$('#cth');
+  const bubble=(cls,h)=>'<div class="cb2 '+cls+'">'+h+'</div>';
+  const scroll=()=>{ const m=ans.querySelectorAll('.cb2.me'); const el=m[m.length-1]; if(!el){ ans.scrollTop=0; return; } ans.scrollTop+=el.getBoundingClientRect().top-ans.getBoundingClientRect().top-6; };
+  const draw=(extra)=>{ let h=''; coachTurns.forEach(t=>{ h+=t.role==='user'?bubble('me',esc(t.content).replace(/\n/g,'<br>')):bubble('ai',t.html||coachMd(t.content)); }); if(extra) h+=extra; ans.innerHTML=h; scroll(); };
+  const status=m=>{ draw(bubble('ai wait',m)); };
+  const thumbs=()=>{ th.innerHTML=coachImgs.map((f,i)=>'<span class="ct"><img alt="" src="'+f.u+'"><b data-i="'+i+'">✕</b></span>').join(''); };
+  th.addEventListener('click',e=>{ const b=e.target.closest('b[data-i]'); if(!b) return; const f=coachImgs.splice(+b.dataset.i,1)[0]; try{ URL.revokeObjectURL(f.u); }catch(_){} thumbs(); });
+  const fmt=(r)=>{ const e=r.e; const a=KB.plain(e.a); const tag=e.t==='card'?'📖':(e.t==='vocab'?'📒':'✅'); let h='<div class="ka"><div class="kt">'+tag+' '+(e.t==='q'?TT('Model answer','الإجابة النموذجية'):(e.t==='card'?TT('From the lesson','من الدرس'):TT('Word','كلمة')))+'</div>'; if(e.t==='vocab') h+='<div class="kq">'+esc(e.q)+'</div>'; else if(e.t==='card') h+='<div class="kq">'+esc(e.q)+'</div>'; h+='<div class="kans">'+(e.t==='card'?e.a.split('\n').map(x=>'• '+esc(x).replace(/&lt;(\/?)b&gt;/g,'<$1b>')).join('<br>'):esc(a).replace(/\n/g,'<br>'))+'</div>'; if(e.why) h+='<div class="kw">💡 '+esc(e.why)+'</div>'; h+='<div class="ks">📘 '+esc(e.src.lab)+' · '+esc(e.src.title)+'</div></div>'; return h; };
+  const answerKB=(text)=>{
+    const blocks=KB.split(text); let html='', plain='', hit=0; const refs=[];
+    blocks.forEach((bl,bi)=>{
+      const res=KB.search(ix,bl,5); const top=res[0];
+      if(blocks.length>1) html+='<div class="kqq">'+(bi+1)+') '+esc(bl.replace(/^\(?[\d٠-٩]{1,2}\s*[\)\.\-–:،]\s*/,'').slice(0,140))+'</div>';
+      if(top&&top.s>=0.42){ hit++; html+=fmt(top); plain+=KB.plain(top.e.q)+' => '+KB.plain(top.e.a)+'\n'; const l=top.e.t==='q'?KB.lessonFor(ix,top.e.src.id,bl):null; if(l&&KB.toks(bl).length>2){ /* lesson card from the same lesson */ html+='<div class="kless">'+fmt({e:l}).replace('class="ka"','class="ka l"')+'</div>'; } res.slice(1,4).filter(r=>r.s>=0.42&&r.e.i!==top.e.i&&r.e.t==='q').slice(0,1).forEach(r=>{ html+='<div class="ksim">🔎 '+TT('Similar question','سؤال شبيه')+': '+esc(KB.plain(r.e.q).slice(0,90))+' → <b>'+esc(KB.plain(r.e.a).split('\n')[0].slice(0,90))+'</b></div>'; }); }
+      else if(top&&top.s>=0.25){ html+='<div class="knf">'+TT('Closest thing I found:','أقرب حاجة لقيتها:')+'</div>'+fmt(top); res.slice(1,3).forEach(r=>{ if(r.s>=0.25) html+=fmt(r); }); plain+=KB.plain(top.e.q)+' => '+KB.plain(top.e.a)+'\n'; }
+      else html+='<div class="knf">'+TT('I could not find this question in Sidra\'s books. Try typing it a bit differently, or take a clearer photo.','مش لاقي السؤال ده في كتب سدرة. جرّبي تكتبيه بشكل تاني أو تصوّريه أوضح.')+'</div>';
+      res.slice(0,4).forEach(r=>{ refs.push(KB.plain(r.e.q).slice(0,200)+' => '+KB.plain(r.e.a).replace(/\n/g,' ').slice(0,260)); });
+    });
+    return {html,plain,hit,refs:refs.slice(0,8)};
+  };
+  const claudeTurn=async(text,refs)=>{
+    const s=coachSmp; if(!s) return;
+    coachCtl=new AbortController(); ask.dataset.run='1'; ask.textContent='⏹ '+TT('Stop','وقف');
+    const hist=coachTurns.slice(-8).map(t=>({role:t.role,content:(t.role==='user'?t.content:(t.plain||t.content))||'-'}));
+    try{ const r=await s([{role:'user',content:coachPrompt(refs)}].concat(hist),{cache:false,signal:coachCtl.signal,modelTier:'default',onText:({text})=>draw(bubble('ai',coachMd(text)))}); coachTurns.push({role:'assistant',content:r.text+(r.truncated?'\n…':'')}); draw(); }
+    catch(e){ if(e&&e.text) coachTurns.push({role:'assistant',content:e.text}); draw(e&&e.code!=='cancelled'?bubble('err',esc(coachErr(e.code))):''); }
+    ask.dataset.run=''; ask.textContent='✨ '+TT('Answer','جاوبي');
+  };
+  const run=async(text)=>{
+    text=text.trim(); if(!text) return;
+    coachTurns.push({role:'user',content:text}); $('#cnew').hidden=false; q.value=''; q.placeholder=TT('Ask another question…','اسألي سؤال تاني…');
+    const r=answerKB(text);
+    if(r.hit||!coachSmp){ coachTurns.push({role:'assistant',html:r.html,plain:r.plain||text,content:r.plain||text}); draw(); if(r.hit&&coachSmp){ ans.insertAdjacentHTML('beforeend','<button class="btn ghost kmore" id="kmore">🤖 '+TT('Explain more','اشرحيلي أكتر')+'</button>'); $('#kmore').onclick=()=>{ $('#kmore').remove(); coachTurns.push({role:'user',content:TT('Please explain this more simply, step by step.','اشرحيلي الإجابة دي أكتر وبشكل أبسط، خطوة خطوة.')}); claudeTurn(text,r.refs); }; scroll(); } }
+    else { draw(bubble('ai wait',TT('Thinking…','بفكّر…'))); await claudeTurn(text,r.refs); }
+  };
+  $('#cnew').onclick=()=>{ if(coachCtl) coachCtl.abort(); coachTurns=[]; coachImgs=[]; thumbs(); q.value=''; ans.innerHTML='<div class="cemp"><div class="big">🧑‍🏫</div>'+TT('Ask me a new question!','اسألي سؤال جديد!')+'</div>'; $('#cnew').hidden=true; q.placeholder=TT('Type your question here… or take a photo 📷','اكتبي سؤالك هنا… أو صوّريه 📷'); };
+  ask.onclick=()=>{ if(coachCtl&&ask.dataset.run==='1'){ coachCtl.abort(); return; } if(coachBusy) return; if(!q.value.trim()){ q.focus(); return; } run(q.value); };
+  q.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){ e.preventDefault(); ask.click(); } });
+  const onPhoto=async(inp)=>{
+    const f=inp.files&&inp.files[0]; inp.value=''; if(!f||coachBusy) return; coachBusy=1; const u=URL.createObjectURL(f); coachImgs=[Object.assign(f,{u})]; thumbs();
+    let text='';
+    try{
+      if(coachSmp&&coachImgOK){ status(TT('Reading your photo…','بقرأ الصورة…')); try{ const r=await coachSmp('Transcribe every question in this photo exactly as written, keeping numbering and answer options, one question per line. Reply with the text only, in the original language, no commentary.',{images:[f],modelTier:'quick',cache:false}); text=(r.text||'').trim(); }catch(e){ text=''; } }
+      if(!text){ status(TT('Reading your photo… (first time may take a minute)','بقرأ الصورة… (أول مرة ممكن تاخد دقيقة)')); text=await coachOCR(f,p=>status(TT('Reading your photo… ','بقرأ الصورة… ')+Math.round(p*100)+'%')); }
+    }catch(e){ text=''; }
+    coachImgs=[]; thumbs(); try{ URL.revokeObjectURL(u); }catch(_){} coachBusy=0;
+    if(text.replace(/\s/g,'').length<6){ draw(bubble('err',TT('I could not read the photo. Take it again closer and straight, or type the question.','مقدرتش أقرأ الصورة. صوّريها تاني من قريب ومستقيمة، أو اكتبي السؤال.'))); return; }
+    q.value=text; run(text); q.value=text;
+  };
+  $('#cph').addEventListener('change',e=>onPhoto(e.target)); $('#cgal').addEventListener('change',e=>onPhoto(e.target));
+  (async()=>{ let s=null; try{ if(window.claude&&window.claude.use) s=await window.claude.use('sample'); }catch(e){} if(!document.body.contains(ask)||!s) return; coachSmp=s; try{ const lim=await s.limits(); if(lim&&lim.images) coachImgOK=true; }catch(e){} })();
+}
 /* ===== UI / app shell ===== */
 const $=(s,r)=>(r||document).querySelector(s);
 const $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
@@ -2896,43 +3035,4 @@ loadSprites(); subjects();
 (function(){ let busy=0; const fit=()=>{ busy=0; document.querySelectorAll('.qbox,.obox').forEach(b=>{ const host=b.parentElement; if(!host||host.hidden||host.offsetParent===null&&getComputedStyle(host).position!=='fixed') return; b.style.zoom=''; const avail=window.innerHeight-14, h=b.offsetHeight; if(h>avail){ b.style.zoom=Math.max(.55,avail/h).toFixed(3); } }); };
  const sched=()=>{ if(!busy){ busy=1; requestAnimationFrame(fit); } };
  try{ new MutationObserver(sched).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden','class']}); window.addEventListener('resize',sched); window.addEventListener('orientationchange',sched); }catch(e){} })();
-/* ---------- Coach: ask any question (typed or photo) ---------- */
-let coachTurns=[], coachImgs=[], coachCtl=null, coachSmp=null;
-function coachPrompt(){
-  const titles=[]; try{ LV.forEach(l=>{ if(!l.boss&&l.title) titles.push(l.title); }); }catch(e){}
-  const les=Array.from(new Set(titles)).slice(0,60).join(' | ');
-  if(S.subject==='ss') return 'أنت «كوتش»، مدرّب ودود لتلميذة اسمها سدرة في الصف الرابع الابتدائي بمصر. المادة: الدراسات الاجتماعية (المنهج المصري، الترم الأول). دروس الترم: '+les+'.\nأجب عن سؤال التلميذة (المكتوب و/أو الموجود في الصورة المرفقة). لو في الصورة عدة أسئلة فأجب عن كل واحد برقمه.\nالقواعد: ابدأ بسطر «📝 السؤال:» تعيد فيه صياغة السؤال باختصار. بعده «✅ الإجابة:» في سطر واحد واضح. بعده «💡 الشرح:» في 3 إلى 5 جمل قصيرة بكلمات يفهمها طفل عمره 9 سنين وبالعربية المبسطة. وإن أمكن أضف «🧠 حيلة للحفظ:» قصيرة. لا تخترع معلومات؛ لو لست متأكدًا فقل ذلك. لو السؤال ليس من الدراسات الاجتماعية أو الصورة غير واضحة فاطلب بلطف توضيحًا أو تصويرًا أوضح. استخدم نصًا عاديًا و**للتمييز** فقط بدون جداول أو عناوين.';
-  return 'You are "Coach", a friendly tutor for Sidra, an Egyptian girl in Primary 4. Subject: Science (Egyptian curriculum, taught in English, Term 1). Lessons this term: '+les+'.\nAnswer the student\'s question (typed and/or in the attached photo). If the photo has several questions, answer each one, numbered.\nRules: start with a line "📝 Question:" restating the question briefly. Then "✅ Answer:" in one clear line. Then "💡 Explanation:" in 3-5 short sentences using simple words a 9-year-old knows. If helpful add "🧠 Memory trick:" (short). Finish with one line in simple Egyptian Arabic starting with "بالعربي:" that sums up the answer. Do not invent facts; if unsure, say so. If the question is not about Science, or the photo is unreadable, kindly say so and ask her to retake the photo or rephrase. Plain text with **bold** only, no tables or headings.';
-}
-const coachMd=t=>esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/^\s*[-•*]\s+/gm,'• ').replace(/\n/g,'<br>');
-function coachErr(code){ const m={not_granted:['Coach needs your permission to use Claude.','المدرّب محتاج إذنك لاستخدام Claude.'],sampling_disabled:['Coach is not available on this account.','المدرّب مش متاح على الحساب ده.'],rate_limited:['Too many questions too fast. Wait a little and try again.','أسئلة كتير بسرعة. استني شوية وجرّبي تاني.'],image_rejected:['I could not read that photo. Try another one.','مقدرتش أقرأ الصورة دي. جرّبي صورة تانية.'],session_expired:['Please sign in again.','سجّلي دخول تاني من فضلك.'],refused:['I can\'t help with that one. Try another question.','مقدرش أساعد في السؤال ده. جرّبي سؤال تاني.'],upstream_error:['Connection problem. Try again.','في مشكلة في الاتصال. جرّبي تاني.']}[code]||['Something went wrong. Try again.','حصلت مشكلة. جرّبي تاني.']; return TT(m[0],m[1]); }
-function coach(){
-  const ar=AR(); coachTurns=[]; coachImgs=[]; coachSmp=null;
-  show(topbar('home','🧑‍🏫 Coach · '+TT('Ask me anything','اسألي المدرّب'))+'<div class="pg coachpg"><div class="coach"><div class="cin">'+
-   '<textarea id="cq" rows="3" placeholder="'+TT('Type your question here… or take a photo 📷','اكتبي سؤالك هنا… أو صوّريه 📷')+'"></textarea><div id="cth" class="cth"></div>'+
-   '<div class="crow"><label class="btn sec cph" id="cphl">📷 '+TT('Photo','صوّري')+'<input id="cph" type="file" accept="image/*" multiple hidden></label><button class="btn" id="cask">✨ '+TT('Ask Coach','اسألي')+'</button></div>'+
-   '<button class="btn ghost" id="cnew" hidden>🔄 '+TT('New question','سؤال جديد')+'</button></div>'+
-   '<div class="cans" id="cans"><div class="cemp"><div class="big">🧑‍🏫</div>'+TT('Hi Sidra! Type a question or take a photo of it, and I will explain it step by step.','أهلًا يا سدرة! اكتبي أي سؤال أو صوّريه وأنا أشرحه لك خطوة خطوة.')+'</div></div></div></div>','coachscreen');
-  const ans=$('#cans'), ask=$('#cask'), q=$('#cq'), th=$('#cth'), ph=$('#cph');
-  const bubble=(cls,h)=>'<div class="cb2 '+cls+'">'+h+'</div>';
-  const draw=(stream,wait)=>{ let h=''; coachTurns.forEach(t=>{ h+=t.role==='user'?bubble('me',esc(t.content).replace(/\n/g,'<br>')+(t.img?' 📷':'')):bubble('ai',coachMd(t.content)); }); if(stream!=null) h+=bubble('ai',coachMd(stream)); if(wait) h+=bubble('ai wait',TT('Thinking…','بفكّر…')); ans.innerHTML=h||ans.innerHTML; ans.scrollTop=ans.scrollHeight; };
-  const thumbs=()=>{ th.innerHTML=coachImgs.map((f,i)=>'<span class="ct"><img alt="" src="'+f.u+'"><b data-i="'+i+'">✕</b></span>').join(''); };
-  th.addEventListener('click',e=>{ const b=e.target.closest('b[data-i]'); if(!b) return; const f=coachImgs.splice(+b.dataset.i,1)[0]; try{ URL.revokeObjectURL(f.u); }catch(_){} thumbs(); });
-  ph.addEventListener('change',()=>{ const max=(coachSmp&&coachSmp.__max)||3; Array.from(ph.files).forEach(f=>{ if(coachImgs.length<max) coachImgs.push(Object.assign(f.slice(0,f.size,f.type),{u:URL.createObjectURL(f)})); }); ph.value=''; thumbs(); });
-  $('#cnew').onclick=()=>{ if(coachCtl) coachCtl.abort(); coachTurns=[]; coachImgs=[]; thumbs(); q.value=''; ans.innerHTML='<div class="cemp"><div class="big">🧑‍🏫</div>'+TT('Ask me a new question!','اسألي سؤال جديد!')+'</div>'; $('#cnew').hidden=true; q.placeholder=TT('Type your question here… or take a photo 📷','اكتبي سؤالك هنا… أو صوّريه 📷'); };
-  const unavailable=()=>{ ask.disabled=true; $('#cphl').style.display='none'; q.disabled=true; ans.innerHTML='<div class="cemp"><div class="big">🔌</div>'+TT('Coach works only inside the Claude app version of the game (the original link). It is not available in this copy.','المدرّب بيشتغل بس جوه نسخة اللعبة على Claude (اللينك الأصلي). مش متاح في النسخة دي.')+'</div>'; };
-  (async()=>{ let s=null; try{ if(window.claude&&window.claude.use) s=await window.claude.use('sample'); }catch(e){} if(!document.body.contains(ask)) return; if(!s){ unavailable(); return; } coachSmp=s; try{ const lim=await s.limits(); if(lim&&lim.images){ s.__max=Math.min(3,lim.images.maxCount||3); } else $('#cphl').style.display='none'; }catch(e){ $('#cphl').style.display='none'; } })();
-  ask.onclick=async()=>{
-    if(coachCtl&&ask.dataset.run==='1'){ coachCtl.abort(); return; }
-    const s=coachSmp; if(!s){ unavailable(); return; }
-    const txt=q.value.trim(); if(!txt&&!coachImgs.length){ q.focus(); return; }
-    const first=!coachTurns.length, imgs=coachImgs.slice();
-    coachTurns.push({role:'user',content:txt||TT('Answer the question in the photo.','أجيبي عن السؤال اللي في الصورة.'),img:!!imgs.length});
-    q.value=''; coachImgs=[]; thumbs(); $('#cnew').hidden=false; q.placeholder=TT('Ask a follow-up…','اسألي سؤال تاني أو اطلبي شرح أكتر…');
-    ask.dataset.run='1'; ask.textContent='⏹ '+TT('Stop','وقف'); draw(null,true);
-    coachCtl=new AbortController(); const input=[{role:'user',content:coachPrompt()}].concat(coachTurns.map(t=>({role:t.role,content:t.content})));
-    try{ const r=await s(input,{cache:false,signal:coachCtl.signal,modelTier:'default',images:imgs.length?imgs:undefined,onText:({text})=>draw(text,false)}); coachTurns.push({role:'assistant',content:r.text+(r.truncated?'\n…':'')}); draw(); }
-    catch(e){ if(e&&e.code!=='cancelled'){ if(e.text) coachTurns.push({role:'assistant',content:e.text}); else coachTurns.pop(); draw(); ans.insertAdjacentHTML('beforeend',bubble('err',esc(coachErr(e&&e.code)))); ans.scrollTop=ans.scrollHeight; } else { if(e.text) coachTurns.push({role:'assistant',content:e.text}); else coachTurns.pop(); draw(); } }
-    ask.dataset.run=''; ask.textContent='✨ '+TT('Ask Coach','اسألي'); };
-}
 </script><script>try{ if("serviceWorker" in navigator && /^https?:/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(function(){}); }catch(e){}</script>
