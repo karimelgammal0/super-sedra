@@ -198,6 +198,14 @@ html,body{overscroll-behavior:none}
 .cbox img{display:block;width:100%;height:auto;user-select:none;-webkit-user-select:none;pointer-events:none}
 .csel{position:absolute;border:3px solid #ff4f93;background:rgba(255,79,147,.18);box-shadow:0 0 0 9999px rgba(0,0,0,.45);pointer-events:none}
 .cbtns{display:flex;gap:8px}.cbtns .btn{margin:0;flex:1;padding:9px 8px;font-size:15px}.cbtns.s .btn{color:#fff;border-color:#47617d;background:#243b52;box-shadow:none}.cbtns.s .btn.on{background:#ff4f93}
+.kd{margin:4px 0}.kd summary{font-weight:800;color:var(--pri2);cursor:pointer;padding:4px 0}.kd .ka{margin:4px 0}
+.cb2.me{font-size:14px;opacity:.85}.ka .kans{font-size:18px}
+
+.rowb{display:flex;gap:8px}.rowb .btn{flex:1}.exb{background:linear-gradient(#ff9f43,#ee7d1a)!important}
+.exl{display:flex;flex-direction:column;gap:8px;padding:6px 2px 24px}.exc{display:flex;justify-content:space-between;align-items:center;text-align:start;gap:8px}.exc span{font-size:.8em;opacity:.85;white-space:nowrap}
+.exq{background:#fff;border-radius:14px;box-shadow:0 2px 6px #0002;overflow:hidden}.exh{all:unset;display:flex;gap:10px;align-items:flex-start;padding:10px 12px;width:100%;box-sizing:border-box;cursor:pointer;font-weight:700;color:#2d3561;line-height:1.45}
+.exh i{font-style:normal;background:#6c5ce7;color:#fff;border-radius:50%;min-width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.8em}.exq.open .exh i{background:#00b894}
+.exa{padding:8px 12px 12px;border-top:2px dashed #dfe6e9;background:#f1fbf6}.exa .kans{font-weight:800;color:#0a7c5a;font-size:1.05em}
 </style>
 <div id="app"></div>
 <script>
@@ -2625,6 +2633,233 @@ function runArcade(kind){
     ask(1,()=>{ mount(); raf=requestAnimationFrame(loop); }); }
   window.QUEST.arcStop=stop;
 }
+/* Extra model answers from the guide books (Coach knowledge bank) */
+const KBX=[];
+const KX=(s,lab,title,items)=>items.forEach(it=>{ if(it[0]==='T') KBX.push({s,lab,title,q:it[1],a:s==='ss'?'صح ✅':'True ✅',w:it[2]||''}); else if(it[0]==='F') KBX.push({s,lab,title,q:it[1],a:s==='ss'?'خطأ ❌':'False ❌',w:it[2]?((s==='ss'?'الصواب: ':'Correct: ')+it[2]):''}); else KBX.push({s,lab,title,q:it[0],a:it[1],w:it[2]||''}); });
+KX('sci','Ch 4','Properties of Light · Guide exercises',[
+ ['Sunlight always travels in (curved lines / zigzag lines / straight lines / circular lines)','Straight lines.'],
+ ['When light hits shiny surfaces such as a mirror, it (is reflected regularly in one direction / is scattered in different directions / is reflected in curved lines / is not reflected)','It is reflected regularly in one direction.'],
+ ['What can be used to direct sunlight into dark places? (white sheet of paper / transparent glass / mirror / wooden board)','A mirror.'],
+ ['Sunlight can be gathered into one point using a (magnifying glass / mirror / thermometer / sundial)','A magnifying glass.'],
+ ['The larger the area of the spot in which sunlight is gathered by a magnifying glass, the spot becomes (less bright and less warm / brighter and warmer)','Less bright and less warm.','A smaller spot is brighter and hotter.'],
+ ['Black paper is preferred in the activity of gathering sunlight with a magnifying glass because it ____ compared with white paper','Absorbs light and burns faster.'],
+ ['A shadow forms behind an object because of (the object blocking the light / light reflecting / light gathering / light scattering)','The object blocking the light.'],
+ ['If an object\'s shadow extends to its right, the Sun is to the ____ of the object (left / right / front / behind)','Left.','The shadow is always on the side opposite the Sun.'],
+ ['When the Sun moves from east to west, the shadow moves (from north to south / south to north / east to west / west to east)','From west to east.'],
+ ['The shadow is long when the Sun is in the (north or south / north or east / east or west / south or west)','East or west.','At sunrise and sunset the Sun is low, so the shadow is long.'],
+ ['The tool used in the past to tell the approximate time from the regular change in the shadow\'s position is the (thermometer / sundial / mirror / magnifying glass)','The sundial.'],
+ ['Sunny places on the ground have a ____ compared with shady places (higher temperature and less dampness / higher temperature and more dampness / lower temperature…)','Higher temperature and less dampness.'],
+ ['Choose all the correct answers: Which of the following are light sources? (the Sun / a wall / a mirror / a lamp)','The Sun and a lamp.'],
+ ['In the activity of tracing the path of light, what is the purpose of using more than one mirror?','To change the direction of light and direct it farther.'],
+ ['Which are safety precautions during the activity of burning paper with sunlight?','Do not look at the gathered spot of light for a long time, and put the hot paper in water after the activity.'],
+ ['Which of the following are reasons for shadow formation? (light travels in straight lines / light travels in curved lines / an object blocks the light / an object allows light to pass through)','Light travels in straight lines, and an object blocks the light.'],
+ ['Which sentences describe the direction of a shadow relative to the Sun\'s position?','The shadow is on the side opposite the Sun, and its direction changes as the Sun\'s position changes.'],
+ ['At noon, which sentences are correct? (the Sun is high / the Sun is low / the shadow is long / the shadow is short)','The Sun is high in the sky, and the shadow is short.'],
+ ['Which procedures should be followed when measuring ground temperature with a thermometer?','Let the thermometer bulb touch the ground, and block direct sunlight from the thermometer (make shade over it).','With a radiation thermometer you hold it at an appropriate distance from the ground.'],
+ ['Sunny places are ____ compared with shady places (warmer / damper / cooler / less damp)','Warmer and less damp.'],
+ ['Choose from column (B) what suits it in column (A): 1. At noon 2. When sunlight falls on an object 3. In the early morning 4. Blocking direct sunlight from a place — a. the object\'s shadow forms on the side opposite the Sun b. a short shadow forms for the object c. its temperature decreases d. a long shadow forms for the object','1 → b (a short shadow forms)\n2 → a (the shadow forms on the side opposite the Sun)\n3 → d (a long shadow forms)\n4 → c (its temperature decreases)'],
+ ['T','When light falls on a mirror, it bounces back regularly in one direction.'],
+ ['F','A magnifying glass is used to spread sunlight.','a magnifying glass is used to gather sunlight into a small spot.'],
+ ['F','The shadow is formed on the same side of the light source.','the shadow forms on the side opposite the light source.'],
+ ['T','The direction of the shadow depends on the Sun\'s position in the sky.'],
+ ['T','The shadow is short at noon.'],
+ ['T','The approximate time can be determined by observing the shadows of objects.'],
+ ['T','The sundial was used in the past to tell the approximate time.'],
+ ['F','The ground in shady places is warmer than the ground in sunny places.','the ground in shady places is cooler.'],
+ ['T','The ground in shady places is damper than the ground in sunny places.'],
+ ['T','When measuring ground temperature, the thermometer bulb must touch the ground.'],
+ ['Correct the underlined word: A mirror is an example of a light source.','Wrong. A mirror is NOT a light source. A light source gives off its own light, for example the Sun or a lamp.'],
+ ['Correct the underlined word: A wall is a smooth, shiny surface.','Mirror. (A mirror is a smooth, shiny surface; a wall is rough.)'],
+ ['Correct the underlined word: Light reflected from a mirror travels in curved lines.','Straight lines.'],
+ ['Correct the underlined word: Rough surfaces reflect light regularly in one direction.','Smooth surfaces reflect light regularly in one direction.'],
+ ['Correct the underlined word: The larger the gathered point of light made by a magnifying glass, the higher its temperature becomes.','Smaller. (The smaller the spot, the higher its temperature.)'],
+ ['Correct the underlined word: White paper heats up faster than black paper when sunlight is gathered on it.','Slower. (Black paper heats up faster.)'],
+ ['Correct the underlined word: The shadows of objects are long at noon.','Short.'],
+ ['Correct the underlined word: The shadow is formed in the same direction of the light source.','Opposite direction.'],
+ ['Correct the underlined word: The direction in which the shadow extends changes with the position of the object during the day.','Sun. (It changes with the position of the Sun.)'],
+ ['Correct the underlined word: At noon, the Sun is low in the sky.','High.'],
+ ['Correct the underlined word: When the Sun rises in the east, your shadow extends toward the south.','West.'],
+ ['Correct the underlined word: The ground in sunny places is cooler than the ground in shady places.','Warmer.'],
+ ['In irregular reflection, light is reflected in (one direction — different directions)','Different directions.'],
+ ['When water mist is sprayed in the path of light reflected from a mirror, we observe that light travels in ____ lines (straight — curved)','Straight.'],
+ ['The area formed behind an object because it blocks the light is (bright — dark)','Dark.'],
+ ['The length of the shadow is ____ during the day (fixed — changing)','Changing.'],
+ ['The shadow is short at (morning — noon)','Noon.'],
+ ['Sunny places are ____ damp than shady places (less — more)','Less.'],
+ ['When using the radiation thermometer to measure ground temperature, you should (hold it at an appropriate distance — let it touch the ground)','Hold it at an appropriate distance.'],
+ ['Write the scientific term: An object that gives off (emits) its own light.','Light source.'],
+ ['Write the scientific term: A light source found in nature that always gives off light.','The Sun.'],
+ ['Write the scientific term: The bouncing back of light when it falls on the surface of an object.','Reflection of light.'],
+ ['Write the scientific term: A dark area where light does not reach, formed behind an object because it blocks the light.','Shadow.'],
+ ['Write the scientific term: A tool used to tell the approximate time based on the changing position of shadows in a regular and fixed way.','Sundial.'],
+ ['Complete: Light reflected from a mirror travels in ____ lines.','Straight.'],
+ ['Complete: Shiny, smooth surfaces reflect light regularly in ____.','One direction.'],
+ ['Complete: When sunlight hits an object, the light is blocked and a dark area forms behind it called ____.','A shadow.'],
+ ['Complete: The direction of the shadow is always ____ to the direction of the Sun.','Opposite.'],
+ ['Complete: If the light source is behind you, your shadow forms ____.','In front of you.'],
+ ['Complete: The light source, object, and shadow always lie along ____.','One straight line.'],
+ ['Complete: Both the ____ and ____ of the shadow change with the Sun\'s position in the sky.','Length and direction.'],
+ ['Complete: At sunrise, the Sun is ____ in the sky, while at noon the Sun is ____ in the sky.','Low … high.'],
+ ['Complete: When the Sun is low in the sky, the shadow is ____ while when the Sun is high in the sky, the shadow is ____.','Long … short.'],
+ ['Complete: The tool used to tell time based on the position of shadows is the ____.','Sundial.'],
+ ['Complete: Ground temperature depends on the amount of ____ that falls on it.','Sunlight.'],
+ ['Complete: The temperature of sunny places is ____ compared with shady places.','Higher.'],
+ ['Complete: Shady places are cooler and are often ____ compared with sunny places.','More damp.'],
+ ['Complete: The ground in sunny places is more ____ while the ground in shady places is more ____.','Warm … cool (warmth … coolness).'],
+ ['Complete: Ground temperature can be measured using the ____.','Thermometer (or radiation thermometer).'],
+ ['Give reason: A mirror reflects light in one direction, while a wall reflects light in different directions.','Because the mirror is a smooth surface while the wall is a rough surface.'],
+ ['Give reason: Avoid looking directly at the Sun through a magnifying glass.','Because this may harm your eyes.'],
+ ['Give reason: Avoid gathering sunlight with a magnifying glass on clothes.','Because this may cause burning of the clothes.'],
+ ['Give reason: Black paper is preferred in the activity of burning paper with sunlight.','Because it absorbs more sunlight, so its temperature rises (it heats up) faster.'],
+ ['Give reason: The light source, object, and shadow always lie on one straight line.','Because light travels in straight lines.'],
+ ['Give reason: The shadow always forms on the opposite side of the Sun.','Because light travels in straight lines, so when it hits an object the object blocks it, and a shadow forms on the side opposite the light source.'],
+ ['Give reason: A shadow forms for you when you stand in front of a light source.','Because your body blocks the light falling on it, so a dark area (a shadow) forms behind you.'],
+ ['Give reason: The direction in which the shadow extends changes during the day.','Because the Sun\'s position in the sky changes during the day.'],
+ ['Give reason: The shadow is short at noon, while it is long in the morning and evening.','Because the Sun is high in the sky at noon, and low in the sky in the morning and evening.'],
+ ['Give reason: The ground in shady places is damper than the ground in sunny places.','Because the ground in shady places absorbs less sunlight, so it is more damp than in sunny places.'],
+ ['Give reason: The temperature in sunny places rises as time passes.','Because the ground absorbs more sunlight.'],
+ ['What happens when light falls on a rough surface such as a wall?','Light scatters irregularly in different directions.'],
+ ['What happens when light falls on a smooth, shiny surface such as a mirror?','Light is reflected regularly in one direction.'],
+ ['What happens when a little starch is sprinkled or water mist is sprayed where light is reflected from a mirror?','We can see the path of the reflected light.'],
+ ['What happens when you look directly at a gathered spot of sunlight made by a magnifying glass for a long time?','This may harm the eyes.'],
+ ['What happens when sunlight is gathered into one point with a magnifying glass and focused on paper for a while?','The paper\'s temperature rises and it may produce smoke and burn.'],
+ ['What happens when sunlight is gathered with a magnifying glass on the bodies of living organisms?','This may cause burns to their bodies.'],
+ ['What happens when the area of the point of sunlight gathered by a magnifying glass becomes smaller?','The spot becomes brighter and hotter.'],
+ ['What happens when a light source is placed to the right of a book? (according to the direction the shadow extends)','The book\'s shadow extends to the left.'],
+ ['What is meant by light source?','An object that gives off its own light.'],
+ ['What is meant by light reflection?','The bouncing back of light when it falls on the surface of an object.'],
+ ['What is meant by shadow?','A dark area where light does not reach, formed behind an object because it blocks the light.'],
+ ['What is meant by sundial?','A tool used to tell the approximate time from the regular and constant change in the shadow\'s position.'],
+ ['Compare between: the path of sunlight when it falls on a mirror and when it falls on a wall.','Mirror: light is reflected regularly in one direction.\nWall: light is scattered irregularly in different directions.'],
+ ['Compare between: an object\'s shadow at sunrise, at noon and at sunset (shadow length and direction).','Sunrise: long shadow, extends to the west.\nNoon: short shadow, beneath the object.\nSunset: long shadow, extends to the east.'],
+ ['What is the importance of the magnifying glass?','It gathers sunlight from a wide area into a small spot.'],
+ ['What is the importance of the sundial?','Telling the approximate time during the day.'],
+ ['Give one example of a substance that can be sprinkled or sprayed into the air to trace the path of light reflected by mirrors.','Starch (or water mist).'],
+ ['Give one example of a surface that reflects light in one direction.','A mirror.'],
+ ['Give one example of a surface that reflects light in different directions.','A wall.'],
+ ['How can the area of the bright spot formed on paper be controlled when sunlight is gathered on it with a magnifying glass?','By moving the magnifying glass closer to and farther from the paper.'],
+ ['Which paper heats up faster, black or white? Why?','The black paper, because it absorbs more sunlight than white paper, so its temperature rises faster.'],
+ ['Mention the safety precautions during the activity of burning paper with sunlight.','• Do not look directly at the Sun through a magnifying glass.\n• Do not look at the gathered spot of light for a long time.\n• Do not gather sunlight on clothes or on the bodies of living organisms.\n• Put the paper in water as soon as the activity is finished.'],
+ ['Explain why shadows form.','Because light travels in straight lines. When it hits an object, the object blocks the light, so a dark area called a shadow forms behind it.'],
+ ['When do we get the shortest shadow during the day?','At noon.'],
+ ['Mention the idea on which the sundial works.','Telling the approximate time from the regular, steady change in the shadow\'s position.'],
+ ['What is the tool used to measure ground temperature? What is it used for?','A thermometer, used to measure the temperature of the ground surface.'],
+ ['What are the most important precautions when using a thermometer to measure ground temperature?','• Make sure its bulb (the bottom part) is in good contact with the ground.\n• Block direct sunlight from hitting it by making shade over it.'],
+]);
+KX('sci','Ch 1','Living Organisms · Guide exercises',[
+ ['Which of the following is an example of a non-living thing? (tree / sparrow / cactus / air)','Air.'],
+ ['____ can live in cracks between rocks in deserts. (sparrows / butterflies / lizards / frogs)','Lizards.'],
+ ['The first step when writing your observation on a record card of a living organism is (writing the topic / drawing a sketch / writing questions / writing sentences to describe it)','Writing the topic.'],
+ ['When classifying the rabbit and the forest fox, both are similar in their (number of legs / shape / size / length)','Number of legs.'],
+ ['____ lives along the Nile River. (frog / sand lizard / jerboa / fennec fox)','The frog.'],
+ ['____ grows in the desert environment. (luffa / acacia / orange / lotus)','Acacia.'],
+ ['Which desert animal drinks a large amount of water at once and stores it inside its body? (desert mouse / fennec fox / jerboa / camel)','The camel.'],
+ ['Which of the following is true about the fennec fox? (long back legs / small ears / the soles of its feet are covered with thick fur / always active during the day)','The soles of its feet are covered with thick fur.'],
+ ['Choose all correct: Living organisms live in ways adapted to the environment in hot and dry places: (underground / in the shade of rocks / under stones / near grass)','Underground, in the shade of rocks, and under stones.'],
+ ['When observing a living organism closely, you can observe its (shape / color / size / weight)','Shape, color and size.'],
+ ['The sparrow and the butterfly can be classified in the same group by shape because both have (legs / the same size / wings / the same color)','Wings.'],
+ ['Among examples of living organisms found in Egypt\'s deserts are (sand lizard / papyrus / date palm / goose)','The sand lizard.'],
+ ['Which of the following is true about the jerboa? (long back legs / always active in the day / hides in cool burrows / drinks a large amount of water at once)','It has long back legs, and it hides in cool burrows.'],
+ ['Which describes the environment along the Nile River? (water is available / the soil is moist / the soil is dry / water is scarce)','Water is available, and the soil is moist.'],
+ ['Choose from column (B) what suits column (A): 1. Small acacia leaves 2. Acacia roots — a. Store water b. Reduce water loss c. Reach water under the ground','1 → b (small leaves reduce water loss)\n2 → c (roots reach water deep under the ground)'],
+ ['T','Some living organisms prefer to live near trees because food is available.'],
+ ['T','Grasshoppers can easily hide near grass and trees.'],
+ ['T','Places under stones and the shade of rocks are moist.'],
+ ['F','Ants live in dry places under stones.','ants live in damp (moist) places under stones.'],
+ ['T','When using a magnifying glass to observe an object that can move, move the object back and front.'],
+ ['F','You can look directly at the sun using a magnifying glass.','never look at the Sun with a magnifying glass; it harms your eyes.'],
+ ['T','You should write your questions and observations at the end of the record card.'],
+ ['F','Living organisms can be classified into groups by observing only their colors.','we also use shape and size.'],
+ ['T','The falcon and the butterfly are similar because both have wings.'],
+ ['F','Farmland along the Nile River is the habitat of the jerboa.','the jerboa lives in the desert.'],
+ ['T','The dung beetle is an organism that may be found near the Nile River.'],
+ ['T','The jerboa and kangaroo are similar in jumping and moving quickly.'],
+ ['F','Many desert animals are always active during the day.','many are active at night.'],
+ ['T','The camel can drink a large amount of water at once to adapt to the desert environment.'],
+ ['Complete using the words (sentences to describe — questions — date and name — sketch): The step after writing the topic title is to write the ____','Date and name.'],
+ ['Complete: What you find about the living organism is recorded using a ____ with thin, clear lines and no shading.','Sketch.'],
+ ['Complete: The characteristics of the living organism include the place, size, shape and color; they are written as ____.','Sentences to describe.'],
+ ['Sparrows can hide (underground — near trees)','Near trees.'],
+ ['When observing an object that can move, the magnifying glass should be placed (close to your eye — far from your eye)','Close to your eye.'],
+ ['Many animals in Egypt\'s deserts hide in burrows during the day to escape from (intense sunlight and heat — extreme cold)','Intense sunlight and heat.'],
+ ['The ____ help the fennec fox release excess heat. (wide eyes — big ears)','Big ears.'],
+ ['Write the scientific term: Everything that feeds, breathes, and grows.','Living organisms.'],
+ ['Write the scientific term: The place where a living organism lives.','Habitat.'],
+ ['Write the scientific term: A tool used to see details of some living organisms.','Magnifying glass.'],
+ ['Write the scientific term: Grouping living organisms with similar characteristics into groups.','Classification.'],
+ ['Write the scientific term: A change in a living organism\'s body parts or behavior that helps it survive in a place.','Adaptation.'],
+ ['Complete: Living organisms differ from non-living things because living organisms ____, breathe and ____.','Feed … grow.'],
+ ['Complete: Among the examples of living organisms are ____ and ____.','Animals and plants.'],
+ ['Complete: Sand, rocks and water in the schoolyard are classified as ____.','Non-living things.'],
+ ['Complete: Places under stones or in the shade of rocks are where there is ____ (water).','Dampness (damp, with water).'],
+ ['Complete: Lizards can live in hot, dry places such as ____.','Deserts.'],
+ ['Complete: The steps for exploring habitats are guess, ____ and ____.','Search and record.'],
+ ['Complete: When observing a living organism with a magnifying glass, wear gloves to protect your hands from getting ____.','Polluted (dirty).'],
+ ['Complete: When using a magnifying glass to observe a tree trunk closely, move your ____ and back and front until you get a clear image.','Face (head) … magnifying glass (hold the glass close to your eye and move your face back and front).'],
+ ['Complete: What you find about a living organism is recorded on a record card using ____ and ____.','A sketch and sentences to describe.'],
+ ['Complete: The dung beetle has an ____ shape and a ____ color.','Oval … black (blackish).'],
+ ['Complete: Living organisms are classified by looking for ____ and ____ among them.','Similarities and differences.'],
+ ['Complete: Papyrus and lotus can be classified in the same group because they are similar in ____.','Color (or living along the Nile River).'],
+ ['Complete: According to shape, the lizard is classified with organisms that have ____ legs, while the grasshopper is classified with organisms that have ____ legs.','Four … six.'],
+ ['Complete: The ____ environment has little water and dry soil.','Desert.'],
+ ['Complete: The desert is a habitat for many animals, such as ____, the lizard, and ____.','The jerboa and the fennec fox.'],
+ ['Complete: The ____ environment is considered a suitable habitat for the orange plant.','Nile River.'],
+ ['Complete: Living organisms in Egypt\'s deserts have special ____ and ____ that help them adapt and survive.','Body shapes … behaviors (clever ways of living).'],
+ ['Complete: The jerboa and kangaroo are similar because both have ____.','Long back legs (jumping and moving quickly).'],
+ ['Complete: Many desert animals are active at night when the temperature is ____.','Low.'],
+ ['Complete: The acacia tree has small ____ and ____ that grow deep underground.','Leaves … roots.'],
+ ['Give reason: The Sun and water are not considered living organisms.','Because they do not feed, grow, or breathe.'],
+ ['Give reason: The cat is considered a living organism.','Because it feeds, grows, and breathes.'],
+ ['Give reason: The kinds of living organisms differ from one habitat to another.','Because living organisms live in habitats that suit their needs.'],
+ ['Give reason: Some birds prefer to live near grass or trees.','Because food is available and it is easy to hide in these places.'],
+ ['Give reason: Some animals prefer to live in the shade of rocks or under stones.','Because they are damp places where water is available, and they are cool because they are away from sunlight.'],
+ ['Give reason: The camel and the snake can be classified into two different groups.','Because they differ in shape: the camel has four legs, while the snake has no legs.'],
+ ['Give reason: The falcon and the chicken can be classified in the same group.','Because they are similar in shape: both have legs and wings.'],
+ ['Give reason: The area along the Nile River is a suitable environment for lotus plants.','Because the lotus plant needs plenty of water.'],
+ ['Give reason: Living organisms in Egypt\'s deserts have special characteristics.','To help them survive in this extreme environment.'],
+ ['Give reason: The camel drinks large amounts of water at once.','To overcome the lack of water in the extreme desert environment.'],
+ ['Give reason: The fennec fox has big ears.','To help cool its body by releasing excess heat.'],
+ ['Give reason: The soles of the fennec fox\'s feet are covered with thick fur.','To protect its feet from the heat of the hot sand when walking on it.'],
+ ['Give reason: The jerboa has long back legs.','Because it uses them to jump and move quickly, reducing the time it touches hot sand.'],
+ ['Give reason: Many desert animals are active at night.','Because temperatures are lower at night than the extreme daytime temperatures.'],
+ ['Give reason: The fennec fox hides in cool underground burrows during the day.','Because sunlight is strong and the desert is extremely hot during the day.'],
+ ['Give reason: Some desert animals rarely drink water.','Because they depend on the water in their food to overcome the lack of water.'],
+ ['Give reason: Desert plants such as acacia trees have small leaves.','To reduce water loss.'],
+ ['Give reason: Acacia roots grow deep underground.','To reach water that is found deep underground.'],
+ ['What happens when a rabbit is moved to live with a camel in the hot desert?','It will be unable to adapt and may not survive.'],
+ ['What happens when living organisms are unable to change their behavior when their environment is changed?','They die because they are not adapted to their new environmental conditions.'],
+ ['What happens when the leaves of the acacia tree are large?','They lose a lot of water.'],
+ ['What happens when the roots of the acacia plant are short and close to the ground surface?','They cannot reach water that is found deep underground.'],
+ ['What happens when the surface area of desert plant leaves increases greatly?','They lose a lot of water.'],
+ ['What happens when a jerboa is moved to an environment with plenty of water?','(Its special body and behavior are for the desert; it is adapted to desert life, not to a water-rich place.)'],
+ ['What is meant by habitat?','The place where the living organism lives.'],
+ ['What is meant by classification?','The process of collecting living organisms with similar characteristics and placing them into groups.'],
+ ['What is meant by adaptation?','A change in body parts or behavior that helps the living organism survive in a place.'],
+ ['Cross out the odd word: Rocks — Water — Trees — Air','Trees (all the others are non-living things; trees are living).'],
+ ['Cross out the odd word: Frog — Ant — Dog — Cactus','Cactus (all the others are animals).'],
+ ['Cross out the odd word: Jerboa — Fennec Fox — Frog — Sand Lizard','Frog (it lives along the Nile River; the others live in the desert).'],
+ ['Cross out the odd word: Lotus — Luffa — Acacia — Orange','Acacia (it lives in the desert; the others live along the Nile River).'],
+ ['Cross out the odd word: Frog — Bee — Goose — Sand Lizard','Sand lizard (it lives in the desert; the others can live along the Nile River).'],
+ ['Compare between the desert environment and the environment along the Nile River (water, sunlight, examples).','Desert: very little water, dry soil, more sunlight; examples: jerboa, fennec fox, lizard, acacia, colocynth.\nAlong the Nile River: plenty of water, moist soil, less sunlight; examples: frog, bees, goose, lotus, luffa, orange, papyrus.'],
+ ['What is the importance of the jerboa\'s back legs?','They help it jump and move quickly.'],
+ ['What is the importance of the deep roots of the acacia plant?','Reaching water that is found deep underground.'],
+ ['What is the importance of the small leaves of the acacia plant?','Reducing water loss.'],
+ ['Give one example of an animal that lives near grass or trees.','Grasshopper.'],
+ ['Give one example of an animal that lives along the Nile River.','Frog.'],
+ ['Give one example of a desert animal with big ears and thick fur on the soles of its feet.','Fennec fox.'],
+ ['Give one example of a desert plant with small leaves.','Acacia.'],
+ ['Give one example of a forest animal with small ears.','Forest fox.'],
+ ['Give a special body shape that helps the jerboa jump and move quickly.','Long back legs.'],
+ ['Classify as plants or animals: Acacia tree, cat, grasshopper, ant, palm tree, pigeon, cactus, luffa','Animals: cat, grasshopper, ant, pigeon.\nPlants: acacia tree, palm tree, cactus, luffa.'],
+ ['Ahmed explored a living organism: put the steps in the correct order (guess, search, record).','Guess → Search → Record.'],
+ ['How do living organisms survive in hot, dry places?','They look for suitable places and live in the shade of rocks or underground, and they have special body shapes and clever ways of living that help them adapt to desert conditions.'],
+ ['What are the main characteristics of places under stones?','Damp places where water is available, and cool because they are away from sunlight.'],
+ ['How would you examine a willow leaf with a magnifying glass?','Hold the magnifying glass close to your eye, then move the willow leaf back and front until the image becomes clear.'],
+ ['Which record card was written correctly using scientific methods? Give two reasons.','The correct card is the one that has the topic and the student\'s name in the right place, and whose sketch uses thin, clear lines.'],
+ ['Which figure is the correct sketch for a record card? Give a reason.','The figure whose drawing uses thin, clear lines without shading.'],
+ ['State a suitable habitat and its characteristics for the acacia tree.','Habitat: the desert. Characteristics: scarce water, dry soil, more sunlight.'],
+ ['Complete the table: special body shapes vs clever ways of living: (1) big ears (2) spending the daytime in underground burrows (3) desert animals being active at night (4) long back legs','Special body shapes: big ears (1) and long back legs (4).\nClever ways of living: spending the daytime in burrows (2) and being active at night (3).'],
+]);
 /* ---------- Coach: ask any question (typed or photo) -> model answer from the books ---------- */
 const KB=(()=>{
   const SW=new Set(('في من علي الي عن ما ماذا هل هو هي هذا هذه ذلك التي الذي كل او ثم قد لا لم لن ان كان يكون تكون مع به بها له لها اي اختر اختاري الاجابه الصحيحه صواب خطا اكمل ضع علامه امام العباره التاليه بين القوسين وصل صل علل فسر لماذا يحدث لو ماذا كيف هي هم هن نحن انت انتم عند حتي قبل بعد ايضا اذا اذ كما مما عما فيما بما لما الا غير بعض'+' a an the is are was were be been of to in on at for and or it its this that these those with as by from what which who why how do does did can could will would should you your we our they them he she his her not no yes all any choose correct answer true false complete put write following sentence between mark').split(' '));
@@ -2658,6 +2893,7 @@ const KB=(()=>{
         }
       }));
     }));
+    if(typeof KBX!=='undefined') KBX.filter(x=>x.s===subj).forEach(x=>{ add(ix,{t:'q',q:x.q,x:'',a:x.a,why:x.w||'',src:{lab:x.lab,title:x.title,id:'x'}}); });
     ix.list.forEach(e=>{ e.ta.forEach(t=>{ ix.df[t]=(ix.df[t]||0)+1; }); });
     ix.N=ix.list.length; cache[subj]=ix; return ix;
   }
@@ -2668,7 +2904,7 @@ const KB=(()=>{
     const out=[];
     ix.list.forEach(e=>{
       let best=0;
-      [e.tq,e.ta].forEach(ds=>{ if(!ds.size) return; let Wd=0,Wi=0; ds.forEach(t=>{ const v=idf(ix,t); Wd+=v; if(qt.has(t)) Wi+=v; }); if(!Wi) return; const dice=2*Wi/(Wq+Wd), cov=Wi/Wq, dcov=Wi/Wd; const sc=Math.max(dice,0.55*cov+0.45*dice*(ds===e.tq?1:.9),0.5*dcov+0.5*dice); if(sc>best) best=sc; });
+      [e.tq,e.ta].forEach(ds=>{ if(!ds.size) return; let Wd=0,Wi=0,m=0; ds.forEach(t=>{ const v=idf(ix,t); Wd+=v; if(qt.has(t)){ Wi+=v; m++; } }); if(!Wi) return; if(m<2&&!(ds.size<=2&&qt.size<=3)) return; const dice=2*Wi/(Wq+Wd), cov=Wi/Wq, dcov=Wi/Wd; const sc=Math.max(dice,Math.sqrt(cov*dcov)*(ds===e.tq?1:.92)); if(sc>best) best=sc; });
       if(!best) return;
       if(e.t==='vocab'){ const tn=nrm(e.q); if(tn&&qn.indexOf(tn)>=0&&qt.size<=3) best+=.25; }
       if(e.t==='card'&&e.q){ const tn=nrm(e.q); if(tn&&qn.indexOf(tn)>=0) best+=.1; }
@@ -2677,7 +2913,7 @@ const KB=(()=>{
     out.sort((a,b)=>b.s-a.s); return out.slice(0,n||6);
   }
   function lessonFor(ix,lid,query){ const cs=ix.list.filter(e=>e.t==='card'&&e.src.id===lid); if(!cs.length) return null; const qt=new Set(toks(query)); let best=null,bs=-1; cs.forEach(e=>{ let s=0; e.ta.forEach(t=>{ if(qt.has(t)) s+=idf(ix,t); }); if(s>bs){ bs=s; best=e; } }); return best; }
-  function split(text){ const L0=String(text).split(/\n+/).map(s=>s.trim()).filter(Boolean); if(L0.length>=3&&/(meant by|define|what is the meaning|المقصود|ما معنى|عرّف|عرف)/i.test(L0[0])&&!/[?؟]\s*\S/.test(L0.slice(1).join(' '))){ const t=L0.slice(1).map(l=>l.replace(/^[^A-Za-z\u0600-\u06FF]+/,'').replace(/^[A-Za-z]\)\s*/,'').replace(/[.…:·\s_\-|]{2,}.*$/,'').replace(/[:.]+$/,'').trim()).filter(l=>l.length>2); if(t.length>=2) return t.map(x=>(/[\u0600-\u06FF]/.test(x)?'ما معنى ':'What is ')+x+'?'); } const lines=String(text).split(/\n+/).map(s=>s.trim()).filter(Boolean); const blocks=[]; let last=0; const start=l=>{ const m=l.match(/^\(?([\d٠-٩]{1,2})\s*([\)\.\-–:،]?)/); if(m){ const n=+String(m[1]).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)); if(m[2]||n===last+1){ last=n; return true; } } if(/^([①-⑩]|q\s*\d|س\s*\d)/i.test(l)){ last++; return true; } return false; }; lines.forEach(l=>{ if(start(l)||!blocks.length) blocks.push(l); else blocks[blocks.length-1]+=' '+l; }); return blocks.length>1?blocks:[String(text).replace(/\s+/g,' ').trim()]; }
+  function split(text){ const L0=String(text).split(/\n+/).map(s=>s.trim()).filter(Boolean); if(L0.length>=3&&/(meant by|define|what is the meaning|المقصود|ما معنى|عرّف|عرف)/i.test(L0[0])&&!/[?؟]\s*\S/.test(L0.slice(1).join(' '))){ const t=L0.slice(1).map(l=>l.replace(/^[^A-Za-z\u0600-\u06FF]+/,'').replace(/^[A-Za-z]\)\s*/,'').replace(/[.…:·\s_\-|]{2,}.*$/,'').replace(/[:.]+$/,'').trim()).filter(l=>l.length>2); if(t.length>=2) return t.map(x=>(/[\u0600-\u06FF]/.test(x)?'ما معنى ':'What is ')+x+'?'); } if(/(column\s*\(?[AB]|from column|العمود|صل |وصل |match )/i.test(String(text).slice(0,160))) return [String(text).replace(/\s+/g,' ').trim()]; const lines=String(text).split(/\n+/).map(s=>s.trim()).filter(Boolean); const blocks=[]; let last=0; const start=l=>{ const m=l.match(/^\(?([\d٠-٩]{1,2})\s*([\)\.\-–:،]?)/); if(m){ const n=+String(m[1]).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)); if(m[2]||n===last+1){ last=n; return true; } } if(/^([①-⑩]|q\s*\d|س\s*\d)/i.test(l)){ last++; return true; } return false; }; lines.forEach(l=>{ if(start(l)||!blocks.length) blocks.push(l); else blocks[blocks.length-1]+=' '+l; }); return blocks.length>1?blocks:[String(text).replace(/\s+/g,' ').trim()]; }
   return {build,search,lessonFor,split,nrm,toks,plain};
 })();
 
@@ -2736,20 +2972,25 @@ function coach(){
    '<div class="cans" id="cans"><div class="cemp"><div class="big">🧑‍🏫</div>'+TT('Hi Sidra! Type a question or take a photo of it, and I will give you the model answer from your books.','أهلًا يا سدرة! اكتبي أي سؤال أو صوّريه وأنا أجيبلك الإجابة النموذجية من كتبك.')+'</div></div></div></div>','coachscreen');
   const ans=$('#cans'), ask=$('#cask'), q=$('#cq'), th=$('#cth');
   const bubble=(cls,h)=>'<div class="cb2 '+cls+'">'+h+'</div>';
-  const scroll=()=>{ const m=ans.querySelectorAll('.cb2.me'); const el=m[m.length-1]; if(!el){ ans.scrollTop=0; return; } ans.scrollTop+=el.getBoundingClientRect().top-ans.getBoundingClientRect().top-6; };
-  const draw=(extra)=>{ let h=''; coachTurns.forEach(t=>{ h+=t.role==='user'?bubble('me',esc(t.content).replace(/\n/g,'<br>')):bubble('ai',t.html||coachMd(t.content)); }); if(extra) h+=extra; ans.innerHTML=h; scroll(); };
+  const scroll=()=>{ const m=ans.querySelectorAll('.cb2.ai'); const el=m[m.length-1]; if(!el){ ans.scrollTop=0; return; } ans.scrollTop+=el.getBoundingClientRect().top-ans.getBoundingClientRect().top-6; };
+  const draw=(extra)=>{ let h=''; coachTurns.forEach(t=>{ h+=t.role==='user'?bubble('me',esc(t.content.length>150?t.content.replace(/\s+/g,' ').slice(0,150)+'…':t.content).replace(/\n/g,'<br>')):bubble('ai',t.html||coachMd(t.content)); }); if(extra) h+=extra; ans.innerHTML=h; scroll(); };
   const status=m=>{ draw(bubble('ai wait',m)); };
   const thumbs=()=>{ th.innerHTML=coachImgs.map((f,i)=>'<span class="ct"><img alt="" src="'+f.u+'"><b data-i="'+i+'">✕</b></span>').join(''); };
   th.addEventListener('click',e=>{ const b=e.target.closest('b[data-i]'); if(!b) return; const f=coachImgs.splice(+b.dataset.i,1)[0]; try{ URL.revokeObjectURL(f.u); }catch(_){} thumbs(); });
-  const fmt=(r)=>{ const e=r.e; const a=KB.plain(e.a); const tag=e.t==='card'?'📖':(e.t==='vocab'?'📒':'✅'); let h='<div class="ka"><div class="kt">'+tag+' '+(e.t==='q'?TT('Model answer','الإجابة النموذجية'):(e.t==='card'?TT('From the lesson','من الدرس'):TT('Word','كلمة')))+'</div>'; if(e.t==='vocab') h+='<div class="kq">'+esc(e.q)+'</div>'; else if(e.t==='card') h+='<div class="kq">'+esc(e.q)+'</div>'; h+='<div class="kans">'+(e.t==='card'?e.a.split('\n').map(x=>'• '+esc(x).replace(/&lt;(\/?)b&gt;/g,'<$1b>')).join('<br>'):esc(a).replace(/\n/g,'<br>'))+'</div>'; if(e.why) h+='<div class="kw">💡 '+esc(e.why)+'</div>'; h+='<div class="ks">📘 '+esc(e.src.lab)+' · '+esc(e.src.title)+'</div></div>'; return h; };
+  const fmt=(r,mini)=>{ const e=r.e; const a=KB.plain(e.a); const isQ=e.t==='q';
+    const head=isQ?'✅ '+TT('Answer','الإجابة'):(e.t==='card'?'📖 '+TT('From the lesson','من الدرس'):'📒 '+TT('Meaning','المعنى'));
+    let h='<div class="ka'+(isQ?'':' l')+'"><div class="kt">'+head+(isQ||!e.q?'':' · '+esc(e.q))+'</div>';
+    h+='<div class="kans">'+(e.t==='card'?e.a.split('\n').map(x=>'• '+esc(x).replace(/&lt;(\/?)b&gt;/g,'<$1b>')).join('<br>'):esc(a).replace(/\n/g,'<br>'))+'</div>';
+    if(e.why&&!mini) h+='<div class="kw">💡 '+esc(e.why)+'</div>';
+    return h+'<div class="ks">📘 '+esc(e.src.lab)+' · '+esc(e.src.title)+'</div></div>'; };
   const answerKB=(text)=>{
     const blocks=KB.split(text); let html='', plain='', hit=0; const refs=[];
     blocks.forEach((bl,bi)=>{
       const res=KB.search(ix,bl,5); const top=res[0];
       if(blocks.length>1) html+='<div class="kqq">'+(bi+1)+') '+esc(bl.replace(/^\(?[\d٠-٩]{1,2}\s*[\)\.\-–:،]\s*/,'').slice(0,140))+'</div>';
-      if(top&&top.s>=0.42){ hit++; html+=fmt(top); plain+=KB.plain(top.e.q)+' => '+KB.plain(top.e.a)+'\n'; const l=top.e.t==='q'?KB.lessonFor(ix,top.e.src.id,bl):null; if(l&&KB.toks(bl).length>2){ /* lesson card from the same lesson */ html+='<div class="kless">'+fmt({e:l}).replace('class="ka"','class="ka l"')+'</div>'; } res.slice(1,4).filter(r=>r.s>=0.42&&r.e.i!==top.e.i&&r.e.t==='q').slice(0,1).forEach(r=>{ html+='<div class="ksim">🔎 '+TT('Similar question','سؤال شبيه')+': '+esc(KB.plain(r.e.q).slice(0,90))+' → <b>'+esc(KB.plain(r.e.a).split('\n')[0].slice(0,90))+'</b></div>'; }); }
-      else if(top&&top.s>=0.25){ html+='<div class="knf">'+TT('Closest thing I found:','أقرب حاجة لقيتها:')+'</div>'+fmt(top); res.slice(1,3).forEach(r=>{ if(r.s>=0.25) html+=fmt(r); }); plain+=KB.plain(top.e.q)+' => '+KB.plain(top.e.a)+'\n'; }
-      else html+='<div class="knf">'+TT('I could not find this question in Sidra\'s books. Try typing it a bit differently, or take a clearer photo.','مش لاقي السؤال ده في كتب سدرة. جرّبي تكتبيه بشكل تاني أو تصوّريه أوضح.')+'</div>';
+      if(top&&top.s>=0.5){ hit++; html+=fmt(top); plain+=KB.plain(top.e.q)+' => '+KB.plain(top.e.a)+'\n'; let more=''; const l=top.e.t==='q'?KB.lessonFor(ix,top.e.src.id,bl):null; if(l&&KB.toks(bl).length>2) more+=fmt({e:l},1); const sim=res.slice(1).filter(r=>r.s>=0.5&&r.e.i!==top.e.i&&r.e.t==='q').slice(0,2); sim.forEach(r=>{ more+='<div class="ksim">🔎 '+esc(KB.plain(r.e.q).slice(0,100))+' → <b>'+esc(KB.plain(r.e.a).split('\n')[0].slice(0,100))+'</b></div>'; }); if(more) html+='<details class="kd"><summary>📖 '+TT('Lesson & similar questions','الدرس وأسئلة شبيهة')+'</summary>'+more+'</details>'; }
+      else if(top&&top.s>=0.35){ html+='<div class="knf">'+TT('Not sure — the closest thing I found:','مش متأكدة، دي أقرب حاجة لقيتها:')+'</div>'+fmt(top); plain+=KB.plain(top.e.q)+' => '+KB.plain(top.e.a)+'\n'; }
+      else html+='<div class="knf">'+TT('This question is not in my answer bank yet. Try typing just the question, or select one question from the photo.','السؤال ده لسه مش في بنك الإجابات. جرّبي تكتبي السؤال لوحده، أو حدّدي سؤال واحد من الصورة.')+'</div>';
       res.slice(0,4).forEach(r=>{ refs.push(KB.plain(r.e.q).slice(0,200)+' => '+KB.plain(r.e.a).replace(/\n/g,' ').slice(0,260)); });
     });
     return {html,plain,hit,refs:refs.slice(0,8)};
@@ -2787,6 +3028,21 @@ function coach(){
   };
   $('#cph').addEventListener('change',e=>onPhoto(e.target)); $('#cgal').addEventListener('change',e=>onPhoto(e.target));
   (async()=>{ let s=null; try{ if(window.claude&&window.claude.use) s=await window.claude.use('sample'); }catch(e){} if(!document.body.contains(ask)||!s) return; coachSmp=s; try{ const lim=await s.limits(); if(lim&&lim.images) coachImgOK=true; }catch(e){} })();
+}
+
+function exercises(lab){
+  const ar=AR(); const all=(typeof KBX!=='undefined'?KBX:[]).filter(x=>x.s===S.subject);
+  const grp={}; all.forEach(x=>{ (grp[x.lab]=grp[x.lab]||{lab:x.lab,title:x.title,items:[]}).items.push(x); });
+  const keys=Object.keys(grp).sort((a,b)=>(parseInt(a.replace(/\D/g,''))||0)-(parseInt(b.replace(/\D/g,''))||0));
+  const H=t=>esc(t).replace(/\n/g,'<br>');
+  if(!lab){
+    show(topbar('home','📝 '+TT('Exercises','التمارين'))+'<div class="pg"><div class="exl">'+(keys.length?keys.map(k=>'<button class="btn exc" data-lab="'+esc(k)+'"><b>'+esc(grp[k].lab)+'</b> · '+esc(grp[k].title.replace(/ · .*$/,''))+'<span>'+grp[k].items.length+' '+TT('questions','سؤال')+'</span></button>').join(''):'<div class="cemp">'+TT('Exercises are coming soon.','التمارين قريبًا.')+'</div>')+'</div></div>','exscreen');
+    document.querySelectorAll('.exc').forEach(b=>b.onclick=()=>exercises(b.dataset.lab));
+    return;
+  }
+  const g=grp[lab]; if(!g) return exercises();
+  show(topbar('exr','📝 '+esc(g.lab)+' · '+TT('Questions','الأسئلة'))+'<div class="pg"><div class="exl">'+g.items.map((x,i)=>'<div class="exq"><button class="exh"><i>'+(i+1)+'</i><span>'+H(x.q)+'</span></button><div class="exa" hidden><div class="kans">'+H(KB.plain(x.a))+'</div>'+(x.w?'<div class="kw">💡 '+H(x.w)+'</div>':'')+'</div></div>').join('')+'</div></div>','exscreen');
+  document.querySelectorAll('.exh').forEach(b=>b.onclick=()=>{ const a=b.nextElementSibling; a.hidden=!a.hidden; b.parentNode.classList.toggle('open',!a.hidden); });
 }
 /* ===== UI / app shell ===== */
 const $=(s,r)=>(r||document).querySelector(s);
@@ -2833,7 +3089,7 @@ function home(){
   show('<div class="hero"><div class="herosky"><span class="c1">☁️</span><span class="c2">☁️</span><span class="c3">⭐</span></div><div class="sid bob">'+sidra('cheer','down','bust')+'</div>'+
    '<h1>'+TT('Super Sedra','سوبر سدرة')+'</h1><div class="rank">🏅 '+rankOf()+' · 🪙 '+S.coins+'</div>'+'<p class="sub">'+TT('Run, jump and bump <b>?</b> blocks to answer science questions!','اجري وانطّي واخبطي علامات <b>؟</b> علشان تجاوبي أسئلة <b>الدراسات الاجتماعية</b>!')+'</p>'+
    '<div class="prog"><div style="width:'+Math.round(done/LV.length*100)+'%"></div></div><div class="pt">'+done+' / '+LV.length+TT(' levels complete',' مرحلة مكتملة')+'</div>'+
-   '<button class="btn big" data-act="play">'+(done&&!all?TT('▶ Continue · Level ','▶ كمّلي · المرحلة ')+lab(LV[next]):(all?TT('▶ Play again','▶ العبي تاني'):TT('▶ Start Adventure','▶ ابدئي المغامرة')))+'</button>'+(done?'<button class="btn sec" data-act="first">'+TT('↺ Start from Level 1','↺ ابدئي من المرحلة الأولى')+'</button>':'')+'<button class="btn coachb" data-act="coach">🧑‍🏫 Coach · '+TT('Ask me any question','اسألي المدرّب أي سؤال')+'</button>'+
+   '<button class="btn big" data-act="play">'+(done&&!all?TT('▶ Continue · Level ','▶ كمّلي · المرحلة ')+lab(LV[next]):(all?TT('▶ Play again','▶ العبي تاني'):TT('▶ Start Adventure','▶ ابدئي المغامرة')))+'</button>'+(done?'<button class="btn sec" data-act="first">'+TT('↺ Start from Level 1','↺ ابدئي من المرحلة الأولى')+'</button>':'')+'<div class="rowb"><button class="btn coachb" data-act="coach">🧑‍🏫 Coach</button><button class="btn coachb exb" data-act="exr">📝 '+TT('Exercises','التمارين')+'</button></div>'+
    (ss?'<div class="row3 two"><button class="btn sec" data-act="map">🗺️ الخريطة</button><button class="btn sec" data-act="notes">📒 الدفتر</button></div>':'<div class="row3"><button class="btn sec" data-act="map">🗺️ Map</button><button class="btn sec" data-act="words">🔤 Word Wall</button><button class="btn sec" data-act="notes">📒 Notebook</button></div><button class="btn gold" data-act="arcade">🎲 Arcade · Archery, Bowling, Tower</button>')+
    '<div class="row3 small"><button class="btn ghost" data-act="stickers">🎖️ '+TT('Stickers','الملصقات')+'</button><button class="btn ghost" data-act="savecode">🔑 '+TT('Save code','كود الحفظ')+'</button><button class="btn ghost" data-act="parent">👨‍👩‍👧 '+TT('Parents','أولياء الأمور')+'</button></div>'+(all?'<button class="btn gold" data-act="cert">🏆 '+TT('My Certificate','شهادتي')+'</button>':'')+
    '<div class="row3 small"><button class="btn ghost" data-act="tmusic">'+(S.music?TT('🎵 Music on','🎵 الموسيقى شغالة'):TT('🎵 Music off','🎵 الموسيقى متوقفة'))+'</button><button class="btn ghost" data-act="tsfx">'+(S.sfx?TT('🔊 Sounds on','🔊 الأصوات شغالة'):TT('🔊 Sounds off','🔊 الأصوات متوقفة'))+'</button><button class="btn ghost" data-act="help">🎮 '+TT('How to play','طريقة اللعب')+'</button></div>'+
@@ -3047,7 +3303,7 @@ document.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]'); if(!b) return; AUD.init(); const a=b.dataset.act; if(a!=='tmusic'&&a!=='tsfx') AUD.sfx('tap');
   switch(a){
    case 'home': home(); break; case 'subjects': subjects(); break; case 'map': map(); break; case 'words': words(); break; case 'notes': notes(); break; case 'cert': cert(); break; case 'help': help(); break;
-   case 'first': preview(0); break; case 'coach': coach(); break;
+   case 'first': preview(0); break; case 'coach': coach(); break; case 'exr': exercises(); break;
    case 'arcade': arcade(); break;
    case 'hint': { const box=b.closest('.qbox'); const part=b.closest('.arcov')?window.QUEST.arcPart:window.QUEST.cur; if(box&&part) hintOpen(box,part); break; }
    case 'stickers': stickers(); break; case 'savecode': savecode(); break; case 'parent': parent(); break;
