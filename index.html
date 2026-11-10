@@ -191,6 +191,13 @@ html,body{overscroll-behavior:none}
 .kt{font-weight:800;font-size:13px;color:#8a5d00}.ka.l .kt{color:#1b7a9c}.kq{font-weight:800;margin:2px 0}.kans{font-weight:800;font-size:17px;line-height:1.5;color:#17324d}.kw{margin-top:4px;font-size:15px;color:#2d5a3d;font-weight:700}.ks{margin-top:4px;font-size:12px;color:var(--mut);font-weight:700}
 .kqq{font-weight:800;margin:6px 0 2px;color:var(--pri2)}.knf{font-weight:700;color:#8a5d00;margin:4px 0}.ksim{font-size:14px;margin:4px 0;color:#52667a}.kless{margin-top:4px}.kmore{margin:6px 0 !important}
 .ka.l .kans{font-weight:600;font-size:15px}.ka .kans{overflow-wrap:anywhere}
+.cropov{position:fixed;inset:0;z-index:60;background:#0f1d2b;display:flex;flex-direction:column;gap:6px;padding:6px}
+.cbar{color:#fff;font-weight:800;text-align:center;font-size:15px;padding:4px}
+.cwrap{flex:1;min-height:0;overflow:auto;background:#1b2e42;border-radius:12px}
+.cbox{position:relative;display:block;touch-action:none;cursor:crosshair;width:100%}.cbox.mv{touch-action:auto;cursor:grab}
+.cbox img{display:block;width:100%;height:auto;user-select:none;-webkit-user-select:none;pointer-events:none}
+.csel{position:absolute;border:3px solid #ff4f93;background:rgba(255,79,147,.18);box-shadow:0 0 0 9999px rgba(0,0,0,.45);pointer-events:none}
+.cbtns{display:flex;gap:8px}.cbtns .btn{margin:0;flex:1;padding:9px 8px;font-size:15px}.cbtns.s .btn{color:#fff;border-color:#47617d;background:#243b52;box-shadow:none}.cbtns.s .btn.on{background:#ff4f93}
 </style>
 <div id="app"></div>
 <script>
@@ -2670,7 +2677,7 @@ const KB=(()=>{
     out.sort((a,b)=>b.s-a.s); return out.slice(0,n||6);
   }
   function lessonFor(ix,lid,query){ const cs=ix.list.filter(e=>e.t==='card'&&e.src.id===lid); if(!cs.length) return null; const qt=new Set(toks(query)); let best=null,bs=-1; cs.forEach(e=>{ let s=0; e.ta.forEach(t=>{ if(qt.has(t)) s+=idf(ix,t); }); if(s>bs){ bs=s; best=e; } }); return best; }
-  function split(text){ const lines=String(text).split(/\n+/).map(s=>s.trim()).filter(Boolean); const blocks=[]; let last=0; const start=l=>{ const m=l.match(/^\(?([\d٠-٩]{1,2})\s*([\)\.\-–:،]?)/); if(m){ const n=+String(m[1]).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)); if(m[2]||n===last+1){ last=n; return true; } } if(/^([①-⑩]|q\s*\d|س\s*\d)/i.test(l)){ last++; return true; } return false; }; lines.forEach(l=>{ if(start(l)||!blocks.length) blocks.push(l); else blocks[blocks.length-1]+=' '+l; }); return blocks.length>1?blocks:[String(text).replace(/\s+/g,' ').trim()]; }
+  function split(text){ const L0=String(text).split(/\n+/).map(s=>s.trim()).filter(Boolean); if(L0.length>=3&&/(meant by|define|what is the meaning|المقصود|ما معنى|عرّف|عرف)/i.test(L0[0])&&!/[?؟]\s*\S/.test(L0.slice(1).join(' '))){ const t=L0.slice(1).map(l=>l.replace(/^[^A-Za-z\u0600-\u06FF]+/,'').replace(/^[A-Za-z]\)\s*/,'').replace(/[.…:·\s_\-|]{2,}.*$/,'').replace(/[:.]+$/,'').trim()).filter(l=>l.length>2); if(t.length>=2) return t.map(x=>(/[\u0600-\u06FF]/.test(x)?'ما معنى ':'What is ')+x+'?'); } const lines=String(text).split(/\n+/).map(s=>s.trim()).filter(Boolean); const blocks=[]; let last=0; const start=l=>{ const m=l.match(/^\(?([\d٠-٩]{1,2})\s*([\)\.\-–:،]?)/); if(m){ const n=+String(m[1]).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)); if(m[2]||n===last+1){ last=n; return true; } } if(/^([①-⑩]|q\s*\d|س\s*\d)/i.test(l)){ last++; return true; } return false; }; lines.forEach(l=>{ if(start(l)||!blocks.length) blocks.push(l); else blocks[blocks.length-1]+=' '+l; }); return blocks.length>1?blocks:[String(text).replace(/\s+/g,' ').trim()]; }
   return {build,search,lessonFor,split,nrm,toks,plain};
 })();
 
@@ -2684,14 +2691,41 @@ function coachPrompt(ref){
 const coachMd=t=>esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/^\s*[-•*]\s+/gm,'• ').replace(/\n/g,'<br>');
 function coachErr(code){ const m={not_granted:['Coach needs your permission to use Claude.','المدرّب محتاج إذنك لاستخدام Claude.'],sampling_disabled:['Claude is not available on this account.','Claude مش متاح على الحساب ده.'],rate_limited:['Too many questions too fast. Wait a little and try again.','أسئلة كتير بسرعة. استني شوية وجرّبي تاني.'],image_rejected:['I could not read that photo. Try another one.','مقدرتش أقرأ الصورة دي. جرّبي صورة تانية.'],session_expired:['Please sign in again.','سجّلي دخول تاني من فضلك.'],refused:['I can\'t help with that one. Try another question.','مقدرش أساعد في السؤال ده. جرّبي سؤال تاني.'],upstream_error:['Connection problem. Try again.','في مشكلة في الاتصال. جرّبي تاني.']}[code]||['Something went wrong. Try again.','حصلت مشكلة. جرّبي تاني.']; return TT(m[0],m[1]); }
 const coachLoadScript=u=>new Promise((ok,no)=>{ const s=document.createElement('script'); s.src=u; s.onload=ok; s.onerror=()=>no(new Error('load')); document.head.appendChild(s); });
-async function coachPrep(file){ try{ const bm=await createImageBitmap(file); const M=1700, k=Math.min(1,M/Math.max(bm.width,bm.height)); const c=document.createElement('canvas'); c.width=Math.round(bm.width*k); c.height=Math.round(bm.height*k); const x=c.getContext('2d'); x.filter='grayscale(1) contrast(1.35)'; x.drawImage(bm,0,0,c.width,c.height); return await new Promise(r=>c.toBlob(r,'image/png')); }catch(e){ return file; } }
+const coachImgEl=src=>new Promise((ok,no)=>{ const i=new Image(); i.onload=()=>ok(i); i.onerror=()=>no(new Error('img')); i.src=src; });
+/* crop (rect in natural px, or null = whole) -> canvas; bin=true: upscale + grayscale + Otsu threshold for OCR */
+function coachCanvas(img,rect,bin){
+  const W=img.naturalWidth, H=img.naturalHeight; const r=rect||{x:0,y:0,w:W,h:H}; const sx=Math.max(0,Math.round(r.x)), sy=Math.max(0,Math.round(r.y)), sw=Math.max(8,Math.min(W-sx,Math.round(r.w))), sh=Math.max(8,Math.min(H-sy,Math.round(r.h)));
+  const k=bin?Math.max(.4,Math.min(3,1800/Math.max(sw,sh))):Math.min(1,1600/Math.max(sw,sh)); const pad=bin?12:0;
+  const c=document.createElement('canvas'); c.width=Math.round(sw*k)+pad*2; c.height=Math.round(sh*k)+pad*2; const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height); x.imageSmoothingQuality='high'; x.drawImage(img,sx,sy,sw,sh,pad,pad,Math.round(sw*k),Math.round(sh*k));
+  if(bin){ const d=x.getImageData(0,0,c.width,c.height), px=d.data, n=c.width*c.height, g=new Uint8Array(n), h=new Array(256).fill(0); for(let i=0;i<n;i++){ const v=(px[i*4]*.299+px[i*4+1]*.587+px[i*4+2]*.114)|0; g[i]=v; h[v]++; } let sum=0; for(let i=0;i<256;i++) sum+=i*h[i]; let sb=0,wb=0,mx=0,th=127; for(let i=0;i<256;i++){ wb+=h[i]; if(!wb) continue; const wf=n-wb; if(!wf) break; sb+=i*h[i]; const mb=sb/wb, mf=(sum-sb)/wf, v=wb*wf*(mb-mf)*(mb-mf); if(v>mx){ mx=v; th=i; } } th=Math.min(210,th+12); for(let i=0;i<n;i++){ const v=g[i]>th?255:0; px[i*4]=px[i*4+1]=px[i*4+2]=v; px[i*4+3]=255; } x.putImageData(d,0,0); }
+  return c;
+}
+const coachBlob=c=>new Promise(r=>c.toBlob(r,'image/png'));
 let coachOcr=null;
-async function coachOCR(file,onProg){
+async function coachOCR(img,rect,onProg){
   if(!window.Tesseract) await coachLoadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
   const lang=S.subject==='ss'?'ara':'eng';
   if(!coachOcr||coachOcr.lang!==lang){ if(coachOcr){ try{ await coachOcr.w.terminate(); }catch(e){} } const w=await Tesseract.createWorker(lang,1,{workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/worker.min.js',corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.1',langPath:'https://cdn.jsdelivr.net/npm/@tesseract.js-data/'+lang+'/4.0.0_best_int',logger:m=>{ if(m&&m.status==='recognizing text'&&onProg) onProg(m.progress); }}); coachOcr={w,lang}; }
-  const img=await coachPrep(file); const r=await coachOcr.w.recognize(img); return (r.data.text||'').trim();
+  try{ await coachOcr.w.setParameters({tessedit_pageseg_mode:rect?'6':'3',preserve_interword_spaces:'1'}); }catch(e){}
+  const r=await coachOcr.w.recognize(await coachBlob(coachCanvas(img,rect,true))); return (r.data.text||'').replace(/[|_]{2,}/g,' ').replace(/[ \t]+\n/g,'\n').trim();
 }
+/* crop screen: drag a box around ONE question */
+function coachCrop(url){ return new Promise(res=>{
+  const ov=document.createElement('div'); ov.className='cropov'; ov.dir=AR()?'rtl':'ltr';
+  ov.innerHTML='<div class="cbar">✂️ '+TT('Drag your finger around ONE question','اسحبي صباعك على السؤال اللي عايزاه (سؤال واحد)')+'</div><div class="cwrap" id="cwrap"><div class="cbox" id="cbox"><img id="cimg" alt="" draggable="false"><div class="csel" id="csel" hidden></div></div></div><div class="cbtns"><button class="btn" id="cok" disabled>✅ '+TT('Read this','اقرأ المنطقة')+'</button><button class="btn sec" id="call">📄 '+TT('Whole photo','الصورة كلها')+'</button></div><div class="cbtns s"><button class="btn ghost" id="czo">－</button><button class="btn ghost" id="cmv">✋ '+TT('Move','تحريك')+'</button><button class="btn ghost" id="czi">＋</button><button class="btn ghost" id="cx">✕ '+TT('Cancel','إلغاء')+'</button></div>';
+  document.body.appendChild(ov); const img=$('#cimg',ov), box=$('#cbox',ov), sel=$('#csel',ov), wrap=$('#cwrap',ov), ok=$('#cok',ov); img.src=url;
+  let zoom=1, move=false, rect=null, st=null; const setZ=z=>{ zoom=Math.max(1,Math.min(5,z)); box.style.width=(zoom*100)+'%'; };
+  const done=v=>{ ov.remove(); res(v); };
+  const pt=e=>{ const r=img.getBoundingClientRect(); return {x:Math.max(0,Math.min(r.width,e.clientX-r.left)),y:Math.max(0,Math.min(r.height,e.clientY-r.top)),w:r.width,h:r.height}; };
+  box.addEventListener('pointerdown',e=>{ if(move) return; e.preventDefault(); const p=pt(e); st=p; rect=null; ok.disabled=true; sel.hidden=false; sel.style.cssText='left:'+p.x+'px;top:'+p.y+'px;width:0;height:0'; try{ box.setPointerCapture(e.pointerId); }catch(_){} });
+  box.addEventListener('pointermove',e=>{ if(!st) return; const p=pt(e); const x=Math.min(st.x,p.x), y=Math.min(st.y,p.y), w=Math.abs(p.x-st.x), h=Math.abs(p.y-st.y); sel.style.cssText='left:'+x+'px;top:'+y+'px;width:'+w+'px;height:'+h+'px'; rect={x,y,w,h,dw:p.w,dh:p.h}; });
+  const end=()=>{ if(!st) return; st=null; if(rect&&rect.w>14&&rect.h>10) ok.disabled=false; else { rect=null; sel.hidden=true; } };
+  box.addEventListener('pointerup',end); box.addEventListener('pointercancel',end);
+  $('#czi',ov).onclick=()=>setZ(zoom+.5); $('#czo',ov).onclick=()=>setZ(zoom-.5);
+  $('#cmv',ov).onclick=()=>{ move=!move; $('#cmv',ov).classList.toggle('on',move); box.classList.toggle('mv',move); };
+  ok.onclick=()=>{ if(!rect) return; const k=img.naturalWidth/rect.dw; done({x:rect.x*k,y:rect.y*k,w:rect.w*k,h:rect.h*k}); };
+  $('#call',ov).onclick=()=>done({whole:true}); $('#cx',ov).onclick=()=>done(null);
+}); }
 function coach(){
   const ar=AR(); coachTurns=[]; coachImgs=[]; coachSmp=null; coachBusy=0; coachImgOK=false;
   const ix=KB.build(S.subject);
@@ -2739,15 +2773,17 @@ function coach(){
   ask.onclick=()=>{ if(coachCtl&&ask.dataset.run==='1'){ coachCtl.abort(); return; } if(coachBusy) return; if(!q.value.trim()){ q.focus(); return; } run(q.value); };
   q.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){ e.preventDefault(); ask.click(); } });
   const onPhoto=async(inp)=>{
-    const f=inp.files&&inp.files[0]; inp.value=''; if(!f||coachBusy) return; coachBusy=1; const u=URL.createObjectURL(f); coachImgs=[Object.assign(f,{u})]; thumbs();
-    let text='';
+    const f=inp.files&&inp.files[0]; inp.value=''; if(!f||coachBusy) return; const u=URL.createObjectURL(f);
+    const pick=await coachCrop(u); if(!pick){ URL.revokeObjectURL(u); return; }
+    coachBusy=1; const rect=pick.whole?null:pick; let text='';
     try{
-      if(coachSmp&&coachImgOK){ status(TT('Reading your photo…','بقرأ الصورة…')); try{ const r=await coachSmp('Transcribe every question in this photo exactly as written, keeping numbering and answer options, one question per line. Reply with the text only, in the original language, no commentary.',{images:[f],modelTier:'quick',cache:false}); text=(r.text||'').trim(); }catch(e){ text=''; } }
-      if(!text){ status(TT('Reading your photo… (first time may take a minute)','بقرأ الصورة… (أول مرة ممكن تاخد دقيقة)')); text=await coachOCR(f,p=>status(TT('Reading your photo… ','بقرأ الصورة… ')+Math.round(p*100)+'%')); }
+      const img=await coachImgEl(u);
+      if(coachSmp&&coachImgOK){ status(TT('Reading your photo…','بقرأ الصورة…')); try{ const cb=await coachBlob(coachCanvas(img,rect,false)); const r=await coachSmp('Transcribe the question(s) in this image exactly as written, keeping numbering and answer options, one question per line. Reply with the text only, in the original language, no commentary.',{images:[cb],modelTier:'quick',cache:false}); text=(r.text||'').trim(); }catch(e){ text=''; } }
+      if(!text){ status(TT('Reading your photo… (first time may take a minute)','بقرأ الصورة… (أول مرة ممكن تاخد دقيقة)')); text=await coachOCR(img,rect,p=>status(TT('Reading your photo… ','بقرأ الصورة… ')+Math.round(p*100)+'%')); }
     }catch(e){ text=''; }
-    coachImgs=[]; thumbs(); try{ URL.revokeObjectURL(u); }catch(_){} coachBusy=0;
-    if(text.replace(/\s/g,'').length<6){ draw(bubble('err',TT('I could not read the photo. Take it again closer and straight, or type the question.','مقدرتش أقرأ الصورة. صوّريها تاني من قريب ومستقيمة، أو اكتبي السؤال.'))); return; }
-    q.value=text; run(text); q.value=text;
+    try{ URL.revokeObjectURL(u); }catch(_){} coachBusy=0;
+    if(text.replace(/\s/g,'').length<6){ draw(bubble('err',TT('I could not read the photo. Select just the question, closer and straight, or type it.','مقدرتش أقرأ الصورة. حدّدي السؤال بس وصوّريه من قريب ومستقيم، أو اكتبيه.'))); return; }
+    q.value=text; q.focus(); draw(bubble('ai wait',TT('This is what I read. Fix any mistakes in the box, then press Answer.','ده اللي قريته. صلّحي أي غلط في المربع وبعدين دوسي جاوبي.')));
   };
   $('#cph').addEventListener('change',e=>onPhoto(e.target)); $('#cgal').addEventListener('change',e=>onPhoto(e.target));
   (async()=>{ let s=null; try{ if(window.claude&&window.claude.use) s=await window.claude.use('sample'); }catch(e){} if(!document.body.contains(ask)||!s) return; coachSmp=s; try{ const lim=await s.limits(); if(lim&&lim.images) coachImgOK=true; }catch(e){} })();
