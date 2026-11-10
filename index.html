@@ -175,6 +175,17 @@ html,body{overscroll-behavior:none}
  .btn{padding:8px 14px;font-size:16px;margin:5px 0}.fb{margin-top:6px;padding:6px 10px}
  .tfq{min-height:60px;padding:8px 6px;font-size:17px}
 }
+/* Coach */
+.coachb{background:linear-gradient(#8a6cff,#6a4be0);box-shadow:0 4px 0 #4a31b3}
+.coachpg{padding:8px 12px}.coach{display:flex;flex-direction:column;gap:8px;height:calc(100dvh - 84px);min-height:300px}
+.cin{display:flex;flex-direction:column;gap:4px;flex:none}
+#cq{width:100%;box-sizing:border-box;border:2px solid var(--line);border-radius:14px;padding:8px 10px;font:inherit;font-size:16px;resize:none;background:#fff;color:var(--ink)}
+.crow{display:flex;gap:8px}.crow .btn{margin:2px 0;flex:1}.cph{text-align:center;cursor:pointer}
+.cth{display:flex;gap:6px;flex-wrap:wrap}.ct{position:relative}.ct img{height:52px;border-radius:8px;border:2px solid var(--line)}.ct b{position:absolute;top:-6px;right:-6px;background:#ff4d6d;color:#fff;border-radius:50%;width:20px;height:20px;font-size:12px;display:grid;place-items:center}
+.cans{flex:1;min-height:0;overflow:auto;background:#fff;border:2px solid var(--line);border-radius:16px;padding:8px;display:flex;flex-direction:column;gap:6px}
+.cemp{margin:auto;text-align:center;font-weight:700;color:var(--mut);padding:10px}.cemp .big{font-size:40px}
+.cb2{border-radius:14px;padding:8px 12px;line-height:1.45;font-size:16px;max-width:94%}.cb2.me{background:#e6f6fc;align-self:flex-end}.cb2.ai{background:#fff7d6;align-self:flex-start;font-weight:600}.cb2.wait{opacity:.6}.cb2.err{background:#ffe1e2;align-self:center}
+@media (orientation:landscape) and (max-height:600px){ .coach{flex-direction:row}.cin{width:42%}.cans{flex:1}#cq{flex:1;min-height:60px} }
 </style>
 <div id="app"></div>
 <script>
@@ -2647,7 +2658,7 @@ function home(){
   show('<div class="hero"><div class="herosky"><span class="c1">☁️</span><span class="c2">☁️</span><span class="c3">⭐</span></div><div class="sid bob">'+sidra('cheer','down','bust')+'</div>'+
    '<h1>'+TT('Super Sedra','سوبر سدرة')+'</h1><div class="rank">🏅 '+rankOf()+' · 🪙 '+S.coins+'</div>'+'<p class="sub">'+TT('Run, jump and bump <b>?</b> blocks to answer science questions!','اجري وانطّي واخبطي علامات <b>؟</b> علشان تجاوبي أسئلة <b>الدراسات الاجتماعية</b>!')+'</p>'+
    '<div class="prog"><div style="width:'+Math.round(done/LV.length*100)+'%"></div></div><div class="pt">'+done+' / '+LV.length+TT(' levels complete',' مرحلة مكتملة')+'</div>'+
-   '<button class="btn big" data-act="play">'+(done&&!all?TT('▶ Continue · Level ','▶ كمّلي · المرحلة ')+lab(LV[next]):(all?TT('▶ Play again','▶ العبي تاني'):TT('▶ Start Adventure','▶ ابدئي المغامرة')))+'</button>'+(done?'<button class="btn sec" data-act="first">'+TT('↺ Start from Level 1','↺ ابدئي من المرحلة الأولى')+'</button>':'')+
+   '<button class="btn big" data-act="play">'+(done&&!all?TT('▶ Continue · Level ','▶ كمّلي · المرحلة ')+lab(LV[next]):(all?TT('▶ Play again','▶ العبي تاني'):TT('▶ Start Adventure','▶ ابدئي المغامرة')))+'</button>'+(done?'<button class="btn sec" data-act="first">'+TT('↺ Start from Level 1','↺ ابدئي من المرحلة الأولى')+'</button>':'')+'<button class="btn coachb" data-act="coach">🧑‍🏫 Coach · '+TT('Ask me any question','اسألي المدرّب أي سؤال')+'</button>'+
    (ss?'<div class="row3 two"><button class="btn sec" data-act="map">🗺️ الخريطة</button><button class="btn sec" data-act="notes">📒 الدفتر</button></div>':'<div class="row3"><button class="btn sec" data-act="map">🗺️ Map</button><button class="btn sec" data-act="words">🔤 Word Wall</button><button class="btn sec" data-act="notes">📒 Notebook</button></div><button class="btn gold" data-act="arcade">🎲 Arcade · Archery, Bowling, Tower</button>')+
    '<div class="row3 small"><button class="btn ghost" data-act="stickers">🎖️ '+TT('Stickers','الملصقات')+'</button><button class="btn ghost" data-act="savecode">🔑 '+TT('Save code','كود الحفظ')+'</button><button class="btn ghost" data-act="parent">👨‍👩‍👧 '+TT('Parents','أولياء الأمور')+'</button></div>'+(all?'<button class="btn gold" data-act="cert">🏆 '+TT('My Certificate','شهادتي')+'</button>':'')+
    '<div class="row3 small"><button class="btn ghost" data-act="tmusic">'+(S.music?TT('🎵 Music on','🎵 الموسيقى شغالة'):TT('🎵 Music off','🎵 الموسيقى متوقفة'))+'</button><button class="btn ghost" data-act="tsfx">'+(S.sfx?TT('🔊 Sounds on','🔊 الأصوات شغالة'):TT('🔊 Sounds off','🔊 الأصوات متوقفة'))+'</button><button class="btn ghost" data-act="help">🎮 '+TT('How to play','طريقة اللعب')+'</button></div>'+
@@ -2861,7 +2872,7 @@ document.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]'); if(!b) return; AUD.init(); const a=b.dataset.act; if(a!=='tmusic'&&a!=='tsfx') AUD.sfx('tap');
   switch(a){
    case 'home': home(); break; case 'subjects': subjects(); break; case 'map': map(); break; case 'words': words(); break; case 'notes': notes(); break; case 'cert': cert(); break; case 'help': help(); break;
-   case 'first': preview(0); break;
+   case 'first': preview(0); break; case 'coach': coach(); break;
    case 'arcade': arcade(); break;
    case 'hint': { const box=b.closest('.qbox'); const part=b.closest('.arcov')?window.QUEST.arcPart:window.QUEST.cur; if(box&&part) hintOpen(box,part); break; }
    case 'stickers': stickers(); break; case 'savecode': savecode(); break; case 'parent': parent(); break;
@@ -2885,4 +2896,43 @@ loadSprites(); subjects();
 (function(){ let busy=0; const fit=()=>{ busy=0; document.querySelectorAll('.qbox,.obox').forEach(b=>{ const host=b.parentElement; if(!host||host.hidden||host.offsetParent===null&&getComputedStyle(host).position!=='fixed') return; b.style.zoom=''; const avail=window.innerHeight-14, h=b.offsetHeight; if(h>avail){ b.style.zoom=Math.max(.55,avail/h).toFixed(3); } }); };
  const sched=()=>{ if(!busy){ busy=1; requestAnimationFrame(fit); } };
  try{ new MutationObserver(sched).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden','class']}); window.addEventListener('resize',sched); window.addEventListener('orientationchange',sched); }catch(e){} })();
+/* ---------- Coach: ask any question (typed or photo) ---------- */
+let coachTurns=[], coachImgs=[], coachCtl=null, coachSmp=null;
+function coachPrompt(){
+  const titles=[]; try{ LV.forEach(l=>{ if(!l.boss&&l.title) titles.push(l.title); }); }catch(e){}
+  const les=Array.from(new Set(titles)).slice(0,60).join(' | ');
+  if(S.subject==='ss') return 'أنت «كوتش»، مدرّب ودود لتلميذة اسمها سدرة في الصف الرابع الابتدائي بمصر. المادة: الدراسات الاجتماعية (المنهج المصري، الترم الأول). دروس الترم: '+les+'.\nأجب عن سؤال التلميذة (المكتوب و/أو الموجود في الصورة المرفقة). لو في الصورة عدة أسئلة فأجب عن كل واحد برقمه.\nالقواعد: ابدأ بسطر «📝 السؤال:» تعيد فيه صياغة السؤال باختصار. بعده «✅ الإجابة:» في سطر واحد واضح. بعده «💡 الشرح:» في 3 إلى 5 جمل قصيرة بكلمات يفهمها طفل عمره 9 سنين وبالعربية المبسطة. وإن أمكن أضف «🧠 حيلة للحفظ:» قصيرة. لا تخترع معلومات؛ لو لست متأكدًا فقل ذلك. لو السؤال ليس من الدراسات الاجتماعية أو الصورة غير واضحة فاطلب بلطف توضيحًا أو تصويرًا أوضح. استخدم نصًا عاديًا و**للتمييز** فقط بدون جداول أو عناوين.';
+  return 'You are "Coach", a friendly tutor for Sidra, an Egyptian girl in Primary 4. Subject: Science (Egyptian curriculum, taught in English, Term 1). Lessons this term: '+les+'.\nAnswer the student\'s question (typed and/or in the attached photo). If the photo has several questions, answer each one, numbered.\nRules: start with a line "📝 Question:" restating the question briefly. Then "✅ Answer:" in one clear line. Then "💡 Explanation:" in 3-5 short sentences using simple words a 9-year-old knows. If helpful add "🧠 Memory trick:" (short). Finish with one line in simple Egyptian Arabic starting with "بالعربي:" that sums up the answer. Do not invent facts; if unsure, say so. If the question is not about Science, or the photo is unreadable, kindly say so and ask her to retake the photo or rephrase. Plain text with **bold** only, no tables or headings.';
+}
+const coachMd=t=>esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/^\s*[-•*]\s+/gm,'• ').replace(/\n/g,'<br>');
+function coachErr(code){ const m={not_granted:['Coach needs your permission to use Claude.','المدرّب محتاج إذنك لاستخدام Claude.'],sampling_disabled:['Coach is not available on this account.','المدرّب مش متاح على الحساب ده.'],rate_limited:['Too many questions too fast. Wait a little and try again.','أسئلة كتير بسرعة. استني شوية وجرّبي تاني.'],image_rejected:['I could not read that photo. Try another one.','مقدرتش أقرأ الصورة دي. جرّبي صورة تانية.'],session_expired:['Please sign in again.','سجّلي دخول تاني من فضلك.'],refused:['I can\'t help with that one. Try another question.','مقدرش أساعد في السؤال ده. جرّبي سؤال تاني.'],upstream_error:['Connection problem. Try again.','في مشكلة في الاتصال. جرّبي تاني.']}[code]||['Something went wrong. Try again.','حصلت مشكلة. جرّبي تاني.']; return TT(m[0],m[1]); }
+function coach(){
+  const ar=AR(); coachTurns=[]; coachImgs=[]; coachSmp=null;
+  show(topbar('home','🧑‍🏫 Coach · '+TT('Ask me anything','اسألي المدرّب'))+'<div class="pg coachpg"><div class="coach"><div class="cin">'+
+   '<textarea id="cq" rows="3" placeholder="'+TT('Type your question here… or take a photo 📷','اكتبي سؤالك هنا… أو صوّريه 📷')+'"></textarea><div id="cth" class="cth"></div>'+
+   '<div class="crow"><label class="btn sec cph" id="cphl">📷 '+TT('Photo','صوّري')+'<input id="cph" type="file" accept="image/*" multiple hidden></label><button class="btn" id="cask">✨ '+TT('Ask Coach','اسألي')+'</button></div>'+
+   '<button class="btn ghost" id="cnew" hidden>🔄 '+TT('New question','سؤال جديد')+'</button></div>'+
+   '<div class="cans" id="cans"><div class="cemp"><div class="big">🧑‍🏫</div>'+TT('Hi Sidra! Type a question or take a photo of it, and I will explain it step by step.','أهلًا يا سدرة! اكتبي أي سؤال أو صوّريه وأنا أشرحه لك خطوة خطوة.')+'</div></div></div></div>','coachscreen');
+  const ans=$('#cans'), ask=$('#cask'), q=$('#cq'), th=$('#cth'), ph=$('#cph');
+  const bubble=(cls,h)=>'<div class="cb2 '+cls+'">'+h+'</div>';
+  const draw=(stream,wait)=>{ let h=''; coachTurns.forEach(t=>{ h+=t.role==='user'?bubble('me',esc(t.content).replace(/\n/g,'<br>')+(t.img?' 📷':'')):bubble('ai',coachMd(t.content)); }); if(stream!=null) h+=bubble('ai',coachMd(stream)); if(wait) h+=bubble('ai wait',TT('Thinking…','بفكّر…')); ans.innerHTML=h||ans.innerHTML; ans.scrollTop=ans.scrollHeight; };
+  const thumbs=()=>{ th.innerHTML=coachImgs.map((f,i)=>'<span class="ct"><img alt="" src="'+f.u+'"><b data-i="'+i+'">✕</b></span>').join(''); };
+  th.addEventListener('click',e=>{ const b=e.target.closest('b[data-i]'); if(!b) return; const f=coachImgs.splice(+b.dataset.i,1)[0]; try{ URL.revokeObjectURL(f.u); }catch(_){} thumbs(); });
+  ph.addEventListener('change',()=>{ const max=(coachSmp&&coachSmp.__max)||3; Array.from(ph.files).forEach(f=>{ if(coachImgs.length<max) coachImgs.push(Object.assign(f.slice(0,f.size,f.type),{u:URL.createObjectURL(f)})); }); ph.value=''; thumbs(); });
+  $('#cnew').onclick=()=>{ if(coachCtl) coachCtl.abort(); coachTurns=[]; coachImgs=[]; thumbs(); q.value=''; ans.innerHTML='<div class="cemp"><div class="big">🧑‍🏫</div>'+TT('Ask me a new question!','اسألي سؤال جديد!')+'</div>'; $('#cnew').hidden=true; q.placeholder=TT('Type your question here… or take a photo 📷','اكتبي سؤالك هنا… أو صوّريه 📷'); };
+  const unavailable=()=>{ ask.disabled=true; $('#cphl').style.display='none'; q.disabled=true; ans.innerHTML='<div class="cemp"><div class="big">🔌</div>'+TT('Coach works only inside the Claude app version of the game (the original link). It is not available in this copy.','المدرّب بيشتغل بس جوه نسخة اللعبة على Claude (اللينك الأصلي). مش متاح في النسخة دي.')+'</div>'; };
+  (async()=>{ let s=null; try{ if(window.claude&&window.claude.use) s=await window.claude.use('sample'); }catch(e){} if(!document.body.contains(ask)) return; if(!s){ unavailable(); return; } coachSmp=s; try{ const lim=await s.limits(); if(lim&&lim.images){ s.__max=Math.min(3,lim.images.maxCount||3); } else $('#cphl').style.display='none'; }catch(e){ $('#cphl').style.display='none'; } })();
+  ask.onclick=async()=>{
+    if(coachCtl&&ask.dataset.run==='1'){ coachCtl.abort(); return; }
+    const s=coachSmp; if(!s){ unavailable(); return; }
+    const txt=q.value.trim(); if(!txt&&!coachImgs.length){ q.focus(); return; }
+    const first=!coachTurns.length, imgs=coachImgs.slice();
+    coachTurns.push({role:'user',content:txt||TT('Answer the question in the photo.','أجيبي عن السؤال اللي في الصورة.'),img:!!imgs.length});
+    q.value=''; coachImgs=[]; thumbs(); $('#cnew').hidden=false; q.placeholder=TT('Ask a follow-up…','اسألي سؤال تاني أو اطلبي شرح أكتر…');
+    ask.dataset.run='1'; ask.textContent='⏹ '+TT('Stop','وقف'); draw(null,true);
+    coachCtl=new AbortController(); const input=[{role:'user',content:coachPrompt()}].concat(coachTurns.map(t=>({role:t.role,content:t.content})));
+    try{ const r=await s(input,{cache:false,signal:coachCtl.signal,modelTier:'default',images:imgs.length?imgs:undefined,onText:({text})=>draw(text,false)}); coachTurns.push({role:'assistant',content:r.text+(r.truncated?'\n…':'')}); draw(); }
+    catch(e){ if(e&&e.code!=='cancelled'){ if(e.text) coachTurns.push({role:'assistant',content:e.text}); else coachTurns.pop(); draw(); ans.insertAdjacentHTML('beforeend',bubble('err',esc(coachErr(e&&e.code)))); ans.scrollTop=ans.scrollHeight; } else { if(e.text) coachTurns.push({role:'assistant',content:e.text}); else coachTurns.pop(); draw(); } }
+    ask.dataset.run=''; ask.textContent='✨ '+TT('Ask Coach','اسألي'); };
+}
 </script><script>try{ if("serviceWorker" in navigator && /^https?:/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(function(){}); }catch(e){}</script>
